@@ -85,11 +85,73 @@ function Boolean ovrDevice.configureTracking!() {
 /// Returns tracking state reading based on the specified absolute system time.
 /// Pass an absTime value of 0.0 to request the most recent sensor reading. In this case
 /// both PredictedPose and SamplePose will have the same value.
-/// ovrDevice.GetEyePose relies on this internally.
+/// ovrDevice.getEyePoses relies on this internally.
 /// This may also be used for more refined timing of FrontBuffer rendering logic, etc.
-function ovrTrackingState ovrDevice.getTrackingState(Float64 absTime) = "ovrDevice_getTrackingState";
+function ovrTrackingState ovrDevice.getTrackingState(Float64 absTime) = "ovrDevice_GetTrackingState";
 
 /// simple overload for getTrackingState using the device's current time
 function ovrTrackingState ovrDevice.getTrackingState() {
   return this.getTrackingState(this.getTimeInSeconds());
 }
+
+/// Re-centers the sensor orientation.
+/// Normally this will recenter the (x,y,z) translational components and the yaw 
+/// component of orientation.
+function ovrDevice.recenterPose!() = "ovrDevice_RecenterPose";
+
+/// Returns last error for HMD state. Returns empty string for no error.
+function String ovrDevice.getLastError() = "ovrDevice_GetLastError";
+
+/// Configures rendering and fills in computed render parameters.
+/// This function can be called multiple times to change rendering settings.
+/// eyeRenderDescOut is a pointer to an array of two ovrEyeRenderDesc structs
+/// that are used to return complete rendering information for each eye.
+///
+///  - apiConfig provides OpenGL specific parameters. Pass null
+///    to shutdown rendering and release all resources.
+///  - distortionCaps describe desired distortion settings.
+///
+function Boolean ovrDevice.configureRendering!(ovrRenderAPIConfig config, Integer distortionCaps, ovrFovPort eyeFovIn[2], ovrEyeRenderDesc eyeRenderDescOut[2] ) = "ovrDevice_ConfigureRendering";
+
+/// disable SDK based rendering
+function Boolean ovrDevice.disableRendering!() = "ovrDevice_DisableRendering";
+
+/// Begins a frame, returning timing information.
+/// This should be called at the beginning of the game rendering loop (on the render thread).
+/// Pass 0 for the frame index if not using ovrDevice.getFrameTiming.
+function ovrFrameTiming ovrDevice.beginFrame!(Size frameIndex) = "ovrDevice_BeginFrame";
+
+/// Ends a frame, submitting the rendered textures to the frame buffer.
+/// - RenderViewport within each eyeTexture can change per frame if necessary.
+/// - 'renderPose' will typically be the value returned from ovrDevice.getEyePoses, 
+///   but can be different if a different head pose was used for rendering.
+/// - This may perform distortion and scaling internally, assuming is it not 
+///   delegated to another thread. 
+/// - Must be called on the same thread as BeginFrame.
+/// - *** This Function will call Present/SwapBuffers and potentially wait for GPU Sync ***.
+function ovrDevice.endFrame!(ovrPose renderPose[2], ovrTexture eyeTexture[2]) = "ovrDevice_EndFrame";
+
+/// Returns the predicted head pose to use when rendering the specified eye.
+/// - Must be called between ovrDevice.beginFrameTiming and ovrDevice.endFrameTiming.
+/// - If the pose is used for rendering the eye, it should be passed to ovrDevice.endFrame.
+function ovrPose[2] ovrDevice.getEyePoses() = "ovrDevice_GetEyePoses";
+
+/// Thread-safe timing function for the main thread. Caller should increment frameIndex
+/// with every frame and pass the index where applicable to functions called on the 
+/// rendering thread.
+function ovrFrameTiming ovrDevice.getFrameTiming(Size frameIndex) = "ovrDevice_GetFrameTiming";
+
+/// Called at the beginning of the frame on the rendering thread.
+/// Pass frameIndex == 0 if ovrDevice.getFrameTiming isn't being used. Otherwise,
+/// pass the same frame index as was used for GetFrameTiming on the main thread.
+function ovrFrameTiming ovrDevice.beginFrameTiming(Size frameIndex) = "ovrDevice_BeginFrameTiming";
+
+/// Marks the end of client distortion rendered frame, tracking the necessary timing information.
+/// This function must be called immediately after Present/SwapBuffers + GPU sync. GPU sync is
+/// important before this call to reduce latency and ensure proper timing.
+function ovrDevice.endFrameTiming!() = "ovrDevice_EndFrameTiming";
+
+/// Initializes and resets frame time tracking. This is typically not necessary, but
+/// is helpful if game changes vsync state or video mode. vsync is assumed to be on if this
+/// isn't called. Resets internal frame index to the specified number.
+function ovrDevice.resetFrameTiming(Size frameIndex) = "ovrDevice_ResetFrameTiming";

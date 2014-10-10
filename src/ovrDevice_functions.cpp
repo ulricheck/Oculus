@@ -125,26 +125,26 @@ FABRIC_EXT_EXPORT void ovrDevice_GetDescription(
   _result.HmdCaps = hmd->HmdCaps;
   _result.TrackingCaps = hmd->TrackingCaps;
   _result.DistortionCaps = hmd->DistortionCaps;
-  _result.Resolution[0] = hmd->Resolution.w;
-  _result.Resolution[1] = hmd->Resolution.h;
-  _result.WindowsPos[0] = hmd->WindowsPos.x;
-  _result.WindowsPos[1] = hmd->WindowsPos.y;
-  _result.DefaultEyeFov[0].x = hmd->DefaultEyeFov[0].UpTan;
-  _result.DefaultEyeFov[0].y = hmd->DefaultEyeFov[0].DownTan;
-  _result.DefaultEyeFov[0].z = hmd->DefaultEyeFov[0].LeftTan;
-  _result.DefaultEyeFov[0].t = hmd->DefaultEyeFov[0].RightTan;
-  _result.DefaultEyeFov[1].x = hmd->DefaultEyeFov[1].UpTan;
-  _result.DefaultEyeFov[1].y = hmd->DefaultEyeFov[1].DownTan;
-  _result.DefaultEyeFov[1].z = hmd->DefaultEyeFov[1].LeftTan;
-  _result.DefaultEyeFov[1].t = hmd->DefaultEyeFov[1].RightTan;
-  _result.MaxEyeFov[0].x = hmd->MaxEyeFov[0].UpTan;
-  _result.MaxEyeFov[0].y = hmd->MaxEyeFov[0].DownTan;
-  _result.MaxEyeFov[0].z = hmd->MaxEyeFov[0].LeftTan;
-  _result.MaxEyeFov[0].t = hmd->MaxEyeFov[0].RightTan;
-  _result.MaxEyeFov[1].x = hmd->MaxEyeFov[1].UpTan;
-  _result.MaxEyeFov[1].y = hmd->MaxEyeFov[1].DownTan;
-  _result.MaxEyeFov[1].z = hmd->MaxEyeFov[1].LeftTan;
-  _result.MaxEyeFov[1].t = hmd->MaxEyeFov[1].RightTan;
+  _result.Resolution.w = hmd->Resolution.w;
+  _result.Resolution.h = hmd->Resolution.h;
+  _result.WindowsPos.x = hmd->WindowsPos.x;
+  _result.WindowsPos.y = hmd->WindowsPos.y;
+  _result.DefaultEyeFov[0].UpTan = hmd->DefaultEyeFov[0].UpTan;
+  _result.DefaultEyeFov[0].DownTan = hmd->DefaultEyeFov[0].DownTan;
+  _result.DefaultEyeFov[0].LeftTan = hmd->DefaultEyeFov[0].LeftTan;
+  _result.DefaultEyeFov[0].RightTan = hmd->DefaultEyeFov[0].RightTan;
+  _result.DefaultEyeFov[1].UpTan = hmd->DefaultEyeFov[1].UpTan;
+  _result.DefaultEyeFov[1].DownTan = hmd->DefaultEyeFov[1].DownTan;
+  _result.DefaultEyeFov[1].LeftTan = hmd->DefaultEyeFov[1].LeftTan;
+  _result.DefaultEyeFov[1].RightTan = hmd->DefaultEyeFov[1].RightTan;
+  _result.MaxEyeFov[0].UpTan = hmd->MaxEyeFov[0].UpTan;
+  _result.MaxEyeFov[0].DownTan = hmd->MaxEyeFov[0].DownTan;
+  _result.MaxEyeFov[0].LeftTan = hmd->MaxEyeFov[0].LeftTan;
+  _result.MaxEyeFov[0].RightTan = hmd->MaxEyeFov[0].RightTan;
+  _result.MaxEyeFov[1].UpTan = hmd->MaxEyeFov[1].UpTan;
+  _result.MaxEyeFov[1].DownTan = hmd->MaxEyeFov[1].DownTan;
+  _result.MaxEyeFov[1].LeftTan = hmd->MaxEyeFov[1].LeftTan;
+  _result.MaxEyeFov[1].RightTan = hmd->MaxEyeFov[1].RightTan;
   _result.EyeRenderOrder[0] = hmd->EyeRenderOrder[0];
   _result.EyeRenderOrder[1] = hmd->EyeRenderOrder[1];
   _result.DisplayDeviceName = hmd->DisplayDeviceName;
@@ -190,7 +190,7 @@ FABRIC_EXT_EXPORT KL::Boolean ovrDevice_ConfigureTracking(
 }
 
 // Defined at src\ovrDevice.kl:76:1
-FABRIC_EXT_EXPORT void ovrDevice_getTrackingState(
+FABRIC_EXT_EXPORT void ovrDevice_GetTrackingState(
   KL::Traits< KL::ovrTrackingState >::Result _result,
   KL::Traits< KL::ovrDevice >::INParam this_,
   KL::Traits< KL::Float64 >::INParam absTime
@@ -201,4 +201,158 @@ FABRIC_EXT_EXPORT void ovrDevice_getTrackingState(
 
   ovrTrackingState ts = ovrHmd_GetTrackingState(hmd, absTime);
   convert(ts, _result);
+}
+
+// Defined at src\ovrDevice.kl:100:1
+FABRIC_EXT_EXPORT void ovrDevice_RecenterPose(
+  KL::Traits< KL::ovrDevice >::IOParam this_
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  ovrHmd_RecenterPose(hmd);  
+}
+
+// Defined at src\ovrDevice.kl:103:1
+FABRIC_EXT_EXPORT void ovrDevice_GetLastError(
+  KL::Traits< KL::String >::Result _result,
+  KL::Traits< KL::ovrDevice >::INParam this_
+) {
+  const char * error = NULL;
+  if(this_->handle) {
+    ovrHmd hmd = (ovrHmd)this_->handle;
+    error = ovrHmd_GetLastError(hmd);
+  }
+  if(!error)
+    error = ovrHmd_GetLastError(NULL);
+  if(error)
+    _result = error;
+}
+
+// Defined at src\ovrDevice.kl:114:1
+FABRIC_EXT_EXPORT KL::Boolean ovrDevice_ConfigureRendering(
+  KL::Traits< KL::ovrDevice >::IOParam this_,
+  KL::Traits< KL::ovrRenderAPIConfig >::INParam config,
+  KL::Traits< KL::SInt32 >::INParam distortionCaps,
+  KL::Traits< KL::FixedArray< KL::ovrFovPort, 2 > >::INParam eyeFovIn,
+  KL::Traits< KL::FixedArray< KL::ovrEyeRenderDesc, 2 > >::INParam eyeRenderDescOut
+) {
+  if(!this_->handle)
+    return false;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+
+  ovrRenderAPIConfig config_;
+  ovrFovPort eyeFovIn_[2];
+  ovrEyeRenderDesc eyeRenderDescOut_[2];
+  convert(config, config_);
+  convert(eyeFovIn[0], eyeFovIn_[0]);
+  convert(eyeFovIn[1], eyeFovIn_[1]);
+  convert(eyeRenderDescOut[0], eyeRenderDescOut_[0]);
+  convert(eyeRenderDescOut[1], eyeRenderDescOut_[1]);
+  return ovrHmd_ConfigureRendering(hmd, &config_, distortionCaps, eyeFovIn_, eyeRenderDescOut_);
+}
+
+// Defined at src\ovrDevice.kl:117:1
+FABRIC_EXT_EXPORT KL::Boolean ovrDevice_DisableRendering(
+  KL::Traits< KL::ovrDevice >::IOParam this_
+) {
+  if(!this_->handle)
+    return false;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  ovrFovPort eyeFovIn_[2];
+  ovrEyeRenderDesc eyeRenderDescOut_[2];
+  return ovrHmd_ConfigureRendering(hmd, NULL, 0, eyeFovIn_, eyeRenderDescOut_);
+}
+
+// Defined at src\ovrDevice.kl:120:1
+FABRIC_EXT_EXPORT void ovrDevice_BeginFrame(
+  KL::Traits< KL::ovrFrameTiming >::Result _result,
+  KL::Traits< KL::ovrDevice >::IOParam this_,
+  KL::Traits< KL::UInt32 >::INParam frameIndex
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  ovrFrameTiming ft = ovrHmd_BeginFrame(hmd, frameIndex);
+  convert(ft, _result);
+}
+
+// Defined at src\ovrDevice.kl:130:1
+FABRIC_EXT_EXPORT void ovrDevice_EndFrame(
+  KL::Traits< KL::ovrDevice >::IOParam this_,
+  KL::Traits< KL::FixedArray< KL::ovrPose, 2 > >::INParam renderPose,
+  KL::Traits< KL::FixedArray< KL::ovrTexture, 2 > >::INParam eyeTexture
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+
+  ovrPosef renderPose_[2];
+  ovrTexture eyeTexture_[2];
+  convert(renderPose[0], renderPose_[0]);
+  convert(renderPose[1], renderPose_[1]);
+  convert(eyeTexture[0], eyeTexture_[0]);
+  convert(eyeTexture[1], eyeTexture_[1]);
+  ovrHmd_EndFrame(hmd, renderPose_, eyeTexture_);
+}
+
+// Defined at src\ovrDevice.kl:135:1
+FABRIC_EXT_EXPORT void ovrDevice_GetEyePoses(
+  KL::Traits< KL::FixedArray< KL::ovrPose, 2 > >::Result _result,
+  KL::Traits< KL::ovrDevice >::INParam this_
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+
+  ovrPosef pose = ovrHmd_GetEyePose(hmd, ovrEye_Left);
+  convert(pose, _result[0]);
+  pose = ovrHmd_GetEyePose(hmd, ovrEye_Right);
+  convert(pose, _result[1]);
+}
+
+// Defined at src\ovrDevice.kl:139:1
+FABRIC_EXT_EXPORT void ovrDevice_GetFrameTiming(
+  KL::Traits< KL::ovrFrameTiming >::Result _result,
+  KL::Traits< KL::ovrDevice >::INParam this_,
+  KL::Traits< KL::UInt32 >::INParam frameIndex
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+
+}
+
+// Defined at src\ovrDevice.kl:144:1
+FABRIC_EXT_EXPORT void ovrDevice_BeginFrameTiming(
+  KL::Traits< KL::ovrFrameTiming >::Result _result,
+  KL::Traits< KL::ovrDevice >::INParam this_,
+  KL::Traits< KL::UInt32 >::INParam frameIndex
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  ovrFrameTiming ft = ovrHmd_BeginFrameTiming(hmd, frameIndex);
+  convert(ft, _result);
+}
+
+// Defined at src\ovrDevice.kl:149:1
+FABRIC_EXT_EXPORT void ovrDevice_EndFrameTiming(
+  KL::Traits< KL::ovrDevice >::IOParam this_
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  ovrHmd_EndFrameTiming(hmd);
+}
+
+// Defined at src\ovrDevice.kl:154:1
+FABRIC_EXT_EXPORT void ovrDevice_ResetFrameTiming(
+  KL::Traits< KL::ovrDevice >::INParam this_,
+  KL::Traits< KL::UInt32 >::INParam frameIndex
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  ovrHmd_ResetFrameTiming(hmd, frameIndex);
 }

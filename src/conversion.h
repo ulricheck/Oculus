@@ -17,6 +17,21 @@ namespace Fabric
       b.y = a.y;
     }
 
+    void convert(KL::ovrSize a, ovrSizei & b) {
+      b.w = a.w;
+      b.h = a.h;
+    }
+
+    void convert(KL::ovrVec2 a, ovrVector2i & b) {
+      b.x = a.x;
+      b.y = a.y;
+    }
+
+    void convert(KL::ovrRect a, ovrRecti & b) {
+      convert(a.Pos, b.Pos);
+      convert(a.Size, b.Size);
+    }
+
     void convert(KL::Vec3 a, ovrVector3f & b) {
       b.x = a.x;
       b.y = a.y;
@@ -54,6 +69,13 @@ namespace Fabric
       convert(a.Position, b.Position);
     }
 
+    void convert(KL::ovrFovPort a, ovrFovPort & b) {
+      b.UpTan = a.UpTan;
+      b.DownTan = a.DownTan;
+      b.LeftTan = a.LeftTan;
+      b.RightTan = a.RightTan;
+    }
+
     void convert(KL::ovrPoseState a, ovrPoseStatef & b) {
       convert(a.ThePose, b.ThePose);
       convert(a.AngularVelocity, b.AngularVelocity);
@@ -80,9 +102,56 @@ namespace Fabric
       b.LastVisionProcessingTime = a.LastVisionProcessingTime;
     }
 
+    void convert(KL::ovrTexture a, ovrTexture & b) {
+      b.Header.API = (ovrRenderAPIType)a.Header.API;
+      convert(a.Header.TextureSize, b.Header.TextureSize);
+      convert(a.Header.RenderViewport, b.Header.RenderViewport);
+    }
+
+    void convert(KL::ovrEyeRenderDesc a, ovrEyeRenderDesc & b) {
+      b.Eye = (ovrEyeType)a.Eye;
+      convert(a.Fov, b.Fov);
+      convert(a.DistortedViewport, b.DistortedViewport);
+      convert(a.PixelsPerTanAngleAtCenter, b.PixelsPerTanAngleAtCenter);
+      convert(a.ViewAdjust, b.ViewAdjust);
+    }
+
+    void convert(KL::ovrRenderAPIConfig a, ovrRenderAPIConfig & b) {
+      b.Header.API = (ovrRenderAPIType)a.Header.API;
+      convert(a.Header.RTSize, b.Header.RTSize);
+      b.Header.Multisample = a.Header.Multisample;
+    }
+
+    void convert(KL::ovrFrameTiming a, ovrFrameTiming & b) {
+      b.DeltaSeconds = a.DeltaSeconds;
+      b.ThisFrameSeconds = a.ThisFrameSeconds;
+      b.TimewarpPointSeconds = a.TimewarpPointSeconds;
+      b.NextFrameSeconds = a.NextFrameSeconds;
+      b.ScanoutMidpointSeconds = a.ScanoutMidpointSeconds;
+      b.EyeScanoutSeconds[0] = a.EyeScanoutSeconds[0];
+      b.EyeScanoutSeconds[1] = a.EyeScanoutSeconds[1];
+    }
+
+    //------------------------------------------------------------------------------------------------------
+
     void convert(ovrVector2f a, KL::Vec2 & b) {
       b.x = a.x;
       b.y = a.y;
+    }
+
+    void convert(ovrSizei a, KL::ovrSize & b) {
+      b.w = a.w;
+      b.h = a.h;
+    }
+
+    void convert(ovrVector2i a, KL::ovrVec2 & b) {
+      b.x = a.x;
+      b.y = a.y;
+    }
+
+    void convert(ovrRecti a, KL::ovrRect & b) {
+      convert(a.Pos, b.Pos);
+      convert(a.Size, b.Size);
     }
 
     void convert(ovrVector3f a, KL::Vec3 & b) {
@@ -122,6 +191,13 @@ namespace Fabric
       convert(a.Position, b.Position);
     }
 
+    void convert(ovrFovPort a, KL::ovrFovPort & b) {
+      b.UpTan = a.UpTan;
+      b.DownTan = a.DownTan;
+      b.LeftTan = a.LeftTan;
+      b.RightTan = a.RightTan;
+    }
+
     void convert(ovrPoseStatef a, KL::ovrPoseState & b) {
       convert(a.ThePose, b.ThePose);
       convert(a.AngularVelocity, b.AngularVelocity);
@@ -146,6 +222,36 @@ namespace Fabric
       convert(a.RawSensorData, b.RawSensorData);
       b.StatusFlags = a.StatusFlags;
       b.LastVisionProcessingTime = a.LastVisionProcessingTime;
+    }
+
+    void convert(ovrTexture a, KL::ovrTexture & b) {
+      b.Header.API = a.Header.API;
+      convert(a.Header.TextureSize, b.Header.TextureSize);
+      convert(a.Header.RenderViewport, b.Header.RenderViewport);
+    }
+
+    void convert(ovrEyeRenderDesc a, KL::ovrEyeRenderDesc & b) {
+      b.Eye = a.Eye;
+      convert(a.Fov, b.Fov);
+      convert(a.DistortedViewport, b.DistortedViewport);
+      convert(a.PixelsPerTanAngleAtCenter, b.PixelsPerTanAngleAtCenter);
+      convert(a.ViewAdjust, b.ViewAdjust);
+    }
+
+    void convert(ovrRenderAPIConfig a, KL::ovrRenderAPIConfig & b) {
+      b.Header.API = a.Header.API;
+      convert(a.Header.RTSize, b.Header.RTSize);
+      b.Header.Multisample = a.Header.Multisample;
+    }
+
+    void convert(ovrFrameTiming a, KL::ovrFrameTiming & b) {
+      b.DeltaSeconds = a.DeltaSeconds;
+      b.ThisFrameSeconds = a.ThisFrameSeconds;
+      b.TimewarpPointSeconds = a.TimewarpPointSeconds;
+      b.NextFrameSeconds = a.NextFrameSeconds;
+      b.ScanoutMidpointSeconds = a.ScanoutMidpointSeconds;
+      b.EyeScanoutSeconds[0] = a.EyeScanoutSeconds[0];
+      b.EyeScanoutSeconds[1] = a.EyeScanoutSeconds[1];
     }
   }
 }

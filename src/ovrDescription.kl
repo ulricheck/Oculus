@@ -36,15 +36,15 @@ struct ovrDescription {
   ///  Distortion capability bits describing whether timewarp and chromatic aberration correction are supported.
   Size DistortionCaps;
   ///  Resolution of the full HMD screen (both eyes) in pixels.
-  Integer Resolution[2];
+  ovrSize Resolution;
   ///  Location of the monitor window on the screen. Set to (0,0) if not supported.
-  Integer WindowsPos[2];
+  ovrVec2 WindowsPos;
   ///  Recommended optical field of view for each eye.
-  Vec4 DefaultEyeFov[2];
+  ovrFovPort DefaultEyeFov[2];
   ///  Maximum optical field of view that can be practically rendered for each eye.
-  Vec4 MaxEyeFov[2];
+  ovrFovPort MaxEyeFov[2];
   ///  Preferred eye rendering order for best performance. Using this value can help reduce latency on sideways scanned screens.
-  Integer EyeRenderOrder[2];
+  ovrEyeType EyeRenderOrder[2];
   ///  System specific name of the display device.
   String DisplayDeviceName;
   ///  System specific ID of the display device.

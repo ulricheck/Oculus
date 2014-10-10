@@ -1,8 +1,16 @@
 {
   "libs": "oculus",
   "code": [
+    "ovrSize.kl",
+    "ovrVec2.kl",
+    "ovrFrameTiming.kl",
     "ovrPose.kl",
     "ovrPoseState.kl",
+    "ovrFovPort.kl",
+    "ovrRect.kl",
+    "ovrEyeRenderDesc.kl",
+    "ovrTexture.kl",
+    "ovrRenderAPIConfig.kl",
     "ovrDescription.kl",
     "ovrSensorData.kl",
     "ovrTrackingState.kl",
