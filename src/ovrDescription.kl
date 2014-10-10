@@ -4,7 +4,7 @@
 
 require Math;
 
-struct ORDescription {
+struct ovrDescription {
   /// Type of the HMD, such as ovrHmd_DK1 orovrHmd_DK2.
   String ORType;
   /// Name describing the product, such as “Oculus Rift DK1”.

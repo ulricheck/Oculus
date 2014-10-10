@@ -1,0 +1,62 @@
+/*
+ *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
+ */
+
+object ovrDevice {
+  /// internal
+  Data handle;
+};
+
+alias Integer ovrTrackingCap;
+///  Supports orientation tracking (IMU).
+const Integer ovrTrackingCap_Orientation = 0x0010;
+///  Supports yaw drift correction via a magnetometer or other means.    
+const Integer ovrTrackingCap_MagYawCorrection = 0x0020;
+///  Supports positional tracking.    
+const Integer ovrTrackingCap_Position = 0x0040;
+///  Overrides the other flags. Indicates that the application
+///  doesn't care about tracking settings. This is the internal
+///  default before ovrDevice.configureTracking is called.
+const Integer ovrTrackingCap_Idle = 0x0100;
+
+/// constructor given a device index
+function ovrDevice(Index index) {
+  this.construct(index);
+}
+
+/// constructor using the first available device
+function ovrDevice() {
+  this.construct(0);
+}
+
+/// internal
+function ovrDevice.construct!(Index index) = "ovrDevice_Construct";
+
+/// returns true if this device is valud
+function Boolean ovrDevice.valid() {
+  Data NULL;
+  return this.handle == NULL;
+}
+
+/// default destructor
+function ~ovrDevice() = "ovrDevice_Destruct";
+
+/// returns the number of available devices
+function Size ovrDevice.numDevices() = "ovrDevice_NumDevices";
+
+/// returns the full description of this device
+function ovrDescription ovrDevice.getDescription() = "ovrDevice_GetDescription";
+
+/// All tracking interface functions are thread-safe, allowing tracking state to be sampled
+/// from different threads.
+/// ConfigureTracking starts sensor sampling, enabling specified capabilities,
+///    described by ovrTrackingCaps.
+///  - supportedTrackingCaps specifies support that is requested. The function will succeed 
+///   even if these caps are not available (i.e. sensor or camera is unplugged). Support
+///    will automatically be enabled if such device is plugged in later. Software should
+///    check ORTrackingState.StatusFlags for real-time status.
+///  - requiredTrackingCaps specify sensor capabilities required at the time of the call.
+///    If they are not available, the function will fail. Pass 0 if only specifying
+///    supportedTrackingCaps.
+///  - Pass 0 for both supportedTrackingCaps and requiredTrackingCaps to disable tracking.
+function Boolean ovrDevice.configureTracking!(ovrTrackingCap supportedTrackingCaps, ovrTrackingCap requiredTrackingCaps) = "ovrDevice_ConfigureTracking";

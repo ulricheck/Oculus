@@ -3,7 +3,7 @@
  */
 
 #include <FabricEDK.h>
-#include "ORDevice_functions.h"
+#include "ovrDevice_functions.h"
 #include <OVR.h>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
@@ -15,37 +15,37 @@ typedef boost::unique_lock< Lock >  WriteLock;
 typedef boost::shared_lock< Lock >  ReadLock;
 Lock gLock;
 
-unsigned int nORDevices = 0;
+unsigned int numOvrDevices = 0;
 
 void ContextCallback(bool opening, void const *contextPtr)
 {
   if ( !opening )
   {
     WriteLock w_lock(gLock);
-    if(nORDevices > 0)
+    if(numOvrDevices > 0)
     {
       ovr_Shutdown();
       report("Oculus Rift finalized.");
     }
-    nORDevices = 0;
+    numOvrDevices = 0;
   }
 }
 IMPLEMENT_FABRIC_EDK_ENTRIES_WITH_CONTEXT_CALLBACK( Oculus, &ContextCallback )
 
-// Defined at src\ORDevice.kl:21:1
-FABRIC_EXT_EXPORT void ORDevice_Construct(
-  KL::Traits< KL::ORDevice >::IOParam this_,
+// Defined at src\ovrDevice.kl:21:1
+FABRIC_EXT_EXPORT void ovrDevice_Construct(
+  KL::Traits< KL::ovrDevice >::IOParam this_,
   KL::Traits< KL::UInt32 >::INParam index
 ) {
 
   WriteLock w_lock(gLock);
 
-  if(nORDevices == 0)
+  if(numOvrDevices == 0)
   {
     ovr_Initialize();
     report("Oculus Rift initialized.");
   }
-  nORDevices++;
+  numOvrDevices++;
 
   this_->handle = (void*)ovrHmd_Create(index);
   if(!this_->handle)
@@ -55,9 +55,9 @@ FABRIC_EXT_EXPORT void ORDevice_Construct(
   }
 }
 
-// Defined at src\ORDevice.kl:28:1
-FABRIC_EXT_EXPORT void ORDevice_Destruct(
-  KL::Traits< KL::ORDevice >::IOParam this_
+// Defined at src\ovrDevice.kl:28:1
+FABRIC_EXT_EXPORT void ovrDevice_Destruct(
+  KL::Traits< KL::ovrDevice >::IOParam this_
 ) {
 
   WriteLock w_lock(gLock);
@@ -65,27 +65,26 @@ FABRIC_EXT_EXPORT void ORDevice_Destruct(
   if(this_->handle)
     ovrHmd_Destroy((ovrHmd)this_->handle);
 
-  if(nORDevices == 1)
+  if(numOvrDevices == 1)
   {
     ovr_Shutdown();
     report("Oculus Rift finalized.");
   }
-  nORDevices--;
+  numOvrDevices--;
 }
 
-// Defined at src\ORDevice.kl:30:1
-FABRIC_EXT_EXPORT KL::UInt32 ORDevice_NumDevices(
-  KL::Traits< KL::ORDevice >::INParam this_
+// Defined at src\ovrDevice.kl:30:1
+FABRIC_EXT_EXPORT KL::UInt32 ovrDevice_NumDevices(
+  KL::Traits< KL::ovrDevice >::INParam this_
 ) {
   return ovrHmd_Detect();
 }
 
-// Defined at src\ORDevice.kl:32:1
-FABRIC_EXT_EXPORT void ORDevice_GetDescription(
-  KL::Traits< KL::ORDescription >::Result _result,
-  KL::Traits< KL::ORDevice >::INParam this_
+// Defined at src\ovrDevice.kl:32:1
+FABRIC_EXT_EXPORT void ovrDevice_GetDescription(
+  KL::Traits< KL::ovrDescription >::Result _result,
+  KL::Traits< KL::ovrDevice >::INParam this_
 ) {
-
 
   if(!this_->handle)
     return;
@@ -150,3 +149,20 @@ FABRIC_EXT_EXPORT void ORDevice_GetDescription(
   _result.DisplayId = hmd->DisplayId;
 }
 
+// Defined at src\ovrDevice.kl:61:1
+FABRIC_EXT_EXPORT KL::Boolean ovrDevice_ConfigureTracking(
+  KL::Traits< KL::ovrDevice >::IOParam this_,
+  KL::Traits< KL::SInt32 >::INParam supportedTrackingCaps,
+  KL::Traits< KL::SInt32 >::INParam requiredTrackingCaps
+) {
+
+  if(this_->handle)
+  {
+    ovrHmd hmd = (ovrHmd)this_->handle;
+    if(ovrHmd_ConfigureTracking(hmd, supportedTrackingCaps, requiredTrackingCaps))
+    {
+      report("Oculus Rift configured for tracking.");
+    }
+  }
+  return false;
+}

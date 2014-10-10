@@ -1,0 +1,9 @@
+require Oculus;
+
+operator entry() {
+  ovrDevice device();
+
+  device.configureTracking(ovrTrackingCap_Orientation |
+    ovrTrackingCap_MagYawCorrection |
+    ovrTrackingCap_Position, 0);
+}

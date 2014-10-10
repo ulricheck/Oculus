@@ -36,7 +36,7 @@ sources = [
 sources += env.Glob('*.kl')
 
 cppFiles = [
-  env.File('ORDevice_functions.cpp')
+  env.File('ovrDevice_functions.cpp')
 ]
 
 extensionFiles = env.Install(STAGE_DIR, [env.File(extName+'.fpm.json')] + env.Glob('*.kl'))

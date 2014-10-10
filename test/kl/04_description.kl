@@ -1,6 +1,6 @@
 require Oculus;
 
 operator entry() {
-  ORDevice device();
+  ovrDevice device();
   report(device.getDescription().Manufacturer);
 }
