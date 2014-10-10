@@ -12,7 +12,7 @@ This extension has been built and tested against Fabric Engine 1.3.0. Higher rel
 structure
 =========
 
-The Oculus extensions uses the KL2EDK tool to generate the required C++ code out of a json codegen file. This makes it easy to add functionality to the extension later, or support future versions of Oculus. You won't find any .cpp files in the *src* folder, the source code for certain non-automatic function bodies can be found in the .codegen.json file in the *src* folder.
+The Oculus extensions uses the KL2EDK tool to generate the required C++ headers. Since the number of callbacks is quite small, they are handcrafted and don't use KL2EDK's advanced codegen functionality.
 
 The latest KL2EDK documentation can be found here: http://documentation.fabricengine.com/FabricEngine/latest/HTML/ExtensionAuthoringGuide/kl2edk.html
 
@@ -26,11 +26,14 @@ building
 
 A scons (http://www.scons.org/) build script is provided. Oculus depends on
 * The Oculus Rift SDK (0.4.2 or higher)
+* A static build of boost (1.55.0 or higher)
 
 To inform scons where to find the Fabric Engine includes as well as the thirdparty libraries, you need to set the following environment variables:
 
 * FABRIC_DIR: Should point to Fabric Engine's installation folder.
 * OCULUS_DIR: Should point to the root of the Oculus SDK.
+* BOOST_INCLUDE_DIR: Should point to Boost include folder.
+* BOOST_LIBRARY_DIR: Should point to Boost library folder.
 
 The temporary files will be built into the *build* folder, while the structured output files will be placed in the *stage* folder.
 
