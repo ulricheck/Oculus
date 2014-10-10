@@ -9,5 +9,22 @@ object ORDevice {
   Data handle;
 };
 
-function ORDevice() = "ORDevice_Construct";
+function ORDevice(Index index) {
+  this.construct(index);
+}
+
+function ORDevice() {
+  this.construct(0);
+}
+
+/// internal
+function ORDevice.construct!(Index index) = "ORDevice_Construct";
+
+function Boolean ORDevice.valid() {
+  Data NULL;
+  return this.handle == NULL;
+}
+
+function Size ORDevice.numDevices() = "ORDevice_NumDevices";
+
 function ~ORDevice() = "ORDevice_Destruct";

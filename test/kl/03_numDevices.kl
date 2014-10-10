@@ -1,0 +1,6 @@
+require Oculus;
+
+operator entry() {
+  ORDevice device();
+  report(device.numDevices());
+}
