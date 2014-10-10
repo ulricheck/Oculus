@@ -1,0 +1,52 @@
+/*
+ *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
+ */
+
+require Math;
+
+struct ORDescription {
+  /// Type of the HMD, such as ovrHmd_DK1 orovrHmd_DK2.
+  String ORType;
+  /// Name describing the product, such as “Oculus Rift DK1”.
+  String ProductName;
+  /// Name of the manufacturer.
+  String Manufacturer;
+  /// Vendor ID reported by the headset USB device.
+  Integer VendorId;
+  ///  Product ID reported by the headset USB device.
+  Integer ProductId;
+  /// Serial number string reported by the headset USB device.
+  String SerialNumber;
+  /// The major version of the sensor firmware.
+  Integer FirmwareMajor;
+  ///  The minor version of the sensor firmware.
+  Integer FirmwareMinor;
+  ///  The horizontal FOV of the position tracking camera frustum.
+  Scalar CameraFrustumHFovInRadians;
+  ///  The vertical FOV of the position tracking camera frustum.
+  Scalar CameraFrustumVFovInRadians;
+  ///  The distance from the position tracking camera to the near frustum bounds.
+  Scalar CameraFrustumNearZInMeters;
+  ///  The distance from the position tracking camera to the far frustum bounds.
+  Scalar CameraFrustumFarZInMeters;
+  ///  HMD capability bits described by ovrHmdCaps.
+  Size HmdCaps;
+  ///  Tracking capability bits describing whether orientation, position tracking, and yaw drift correction are supported.
+  Size TrackingCaps;
+  ///  Distortion capability bits describing whether timewarp and chromatic aberration correction are supported.
+  Size DistortionCaps;
+  ///  Resolution of the full HMD screen (both eyes) in pixels.
+  Integer Resolution[2];
+  ///  Location of the monitor window on the screen. Set to (0,0) if not supported.
+  Integer WindowsPos[2];
+  ///  Recommended optical field of view for each eye.
+  Vec4 DefaultEyeFov[2];
+  ///  Maximum optical field of view that can be practically rendered for each eye.
+  Vec4 MaxEyeFov[2];
+  ///  Preferred eye rendering order for best performance. Using this value can help reduce latency on sideways scanned screens.
+  Integer EyeRenderOrder[2];
+  ///  System specific name of the display device.
+  String DisplayDeviceName;
+  ///  System specific ID of the display device.
+  Integer DisplayId;
+};

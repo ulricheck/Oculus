@@ -1,6 +1,7 @@
 {
   "libs": "oculus",
   "code": [
+    "ORDescription.kl",
     "ORDevice.kl"
   ]
 }

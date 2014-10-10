@@ -32,7 +32,7 @@ void ContextCallback(bool opening, void const *contextPtr)
 }
 IMPLEMENT_FABRIC_EDK_ENTRIES_WITH_CONTEXT_CALLBACK( Oculus, &ContextCallback )
 
-// Defined at src\ORDevice.kl:12:1
+// Defined at src\ORDevice.kl:21:1
 FABRIC_EXT_EXPORT void ORDevice_Construct(
   KL::Traits< KL::ORDevice >::IOParam this_,
   KL::Traits< KL::UInt32 >::INParam index
@@ -47,27 +47,23 @@ FABRIC_EXT_EXPORT void ORDevice_Construct(
   }
   nORDevices++;
 
-  if(index >= ovrHmd_Detect()) {
-    return;
+  this_->handle = (void*)ovrHmd_Create(index);
+  if(!this_->handle)
+  {
+    report("Using debug device of type ovrHmd_DK2.");
+    this_->handle = (void*)ovrHmd_CreateDebug(ovrHmd_DK2);
   }
-
-  // }
-  // ovrHmd hmd = ovrHmd_Create(0);
 }
 
 // Defined at src\ORDevice.kl:28:1
-FABRIC_EXT_EXPORT KL::UInt32 ORDevice_NumDevices(
-  KL::Traits< KL::ORDevice >::INParam this_
-) {
-  return ovrHmd_Detect();
-}
-
-// Defined at src\ORDevice.kl:13:1
 FABRIC_EXT_EXPORT void ORDevice_Destruct(
   KL::Traits< KL::ORDevice >::IOParam this_
 ) {
 
   WriteLock w_lock(gLock);
+
+  if(this_->handle)
+    ovrHmd_Destroy((ovrHmd)this_->handle);
 
   if(nORDevices == 1)
   {
@@ -76,3 +72,81 @@ FABRIC_EXT_EXPORT void ORDevice_Destruct(
   }
   nORDevices--;
 }
+
+// Defined at src\ORDevice.kl:30:1
+FABRIC_EXT_EXPORT KL::UInt32 ORDevice_NumDevices(
+  KL::Traits< KL::ORDevice >::INParam this_
+) {
+  return ovrHmd_Detect();
+}
+
+// Defined at src\ORDevice.kl:32:1
+FABRIC_EXT_EXPORT void ORDevice_GetDescription(
+  KL::Traits< KL::ORDescription >::Result _result,
+  KL::Traits< KL::ORDevice >::INParam this_
+) {
+
+
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+
+  switch(hmd->Type)
+  {
+    case ovrHmd_DK1:
+    {
+      _result.ORType = "DK1";
+      break;
+    }
+    case ovrHmd_DKHD:
+    {
+      _result.ORType = "DKHD";
+      break;
+    }
+    case ovrHmd_DK2:
+    {
+      _result.ORType = "DK2";
+      break;
+    }
+  }
+
+  _result.ProductName = hmd->ProductName;  
+  _result.Manufacturer = hmd->Manufacturer;  
+  _result.VendorId = hmd->VendorId;
+  _result.ProductId = hmd->ProductId;
+  _result.SerialNumber = hmd->SerialNumber;
+  _result.FirmwareMajor = hmd->FirmwareMajor;
+  _result.FirmwareMinor = hmd->FirmwareMinor;
+  _result.CameraFrustumHFovInRadians = hmd->CameraFrustumHFovInRadians;
+  _result.CameraFrustumVFovInRadians = hmd->CameraFrustumVFovInRadians;
+  _result.CameraFrustumNearZInMeters = hmd->CameraFrustumNearZInMeters;
+  _result.CameraFrustumFarZInMeters = hmd->CameraFrustumFarZInMeters;
+  _result.HmdCaps = hmd->HmdCaps;
+  _result.TrackingCaps = hmd->TrackingCaps;
+  _result.DistortionCaps = hmd->DistortionCaps;
+  _result.Resolution[0] = hmd->Resolution.w;
+  _result.Resolution[1] = hmd->Resolution.h;
+  _result.WindowsPos[0] = hmd->WindowsPos.x;
+  _result.WindowsPos[1] = hmd->WindowsPos.y;
+  _result.DefaultEyeFov[0].x = hmd->DefaultEyeFov[0].UpTan;
+  _result.DefaultEyeFov[0].y = hmd->DefaultEyeFov[0].DownTan;
+  _result.DefaultEyeFov[0].z = hmd->DefaultEyeFov[0].LeftTan;
+  _result.DefaultEyeFov[0].t = hmd->DefaultEyeFov[0].RightTan;
+  _result.DefaultEyeFov[1].x = hmd->DefaultEyeFov[1].UpTan;
+  _result.DefaultEyeFov[1].y = hmd->DefaultEyeFov[1].DownTan;
+  _result.DefaultEyeFov[1].z = hmd->DefaultEyeFov[1].LeftTan;
+  _result.DefaultEyeFov[1].t = hmd->DefaultEyeFov[1].RightTan;
+  _result.MaxEyeFov[0].x = hmd->MaxEyeFov[0].UpTan;
+  _result.MaxEyeFov[0].y = hmd->MaxEyeFov[0].DownTan;
+  _result.MaxEyeFov[0].z = hmd->MaxEyeFov[0].LeftTan;
+  _result.MaxEyeFov[0].t = hmd->MaxEyeFov[0].RightTan;
+  _result.MaxEyeFov[1].x = hmd->MaxEyeFov[1].UpTan;
+  _result.MaxEyeFov[1].y = hmd->MaxEyeFov[1].DownTan;
+  _result.MaxEyeFov[1].z = hmd->MaxEyeFov[1].LeftTan;
+  _result.MaxEyeFov[1].t = hmd->MaxEyeFov[1].RightTan;
+  _result.EyeRenderOrder[0] = hmd->EyeRenderOrder[0];
+  _result.EyeRenderOrder[1] = hmd->EyeRenderOrder[1];
+  _result.DisplayDeviceName = hmd->DisplayDeviceName;
+  _result.DisplayId = hmd->DisplayId;
+}
+

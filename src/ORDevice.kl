@@ -2,8 +2,6 @@
  *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
  */
 
-require Math;
-
 object ORDevice {
   /// internal
   Data handle;
@@ -25,6 +23,9 @@ function Boolean ORDevice.valid() {
   return this.handle == NULL;
 }
 
+function ~ORDevice() = "ORDevice_Destruct";
+
 function Size ORDevice.numDevices() = "ORDevice_NumDevices";
 
-function ~ORDevice() = "ORDevice_Destruct";
+function ORDescription ORDevice.getDescription() = "ORDevice_GetDescription";
+
