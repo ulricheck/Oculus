@@ -1,0 +1,15 @@
+/*
+ *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
+ */
+
+require Math;
+
+struct ovrPoseState {
+  ovrPose ThePose;
+  Vec3 AngularVelocity;
+  Vec3 LinearVelocity;
+  Vec3 AngularAcceleration;
+  Vec3 LinearAcceleration;
+  /// Absolute time of this state sample.
+  Float64 TimeInSeconds;
+};

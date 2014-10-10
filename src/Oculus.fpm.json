@@ -1,7 +1,11 @@
 {
   "libs": "oculus",
   "code": [
+    "ovrPose.kl",
+    "ovrPoseState.kl",
     "ovrDescription.kl",
+    "ovrSensorData.kl",
+    "ovrTrackingState.kl",
     "ovrDevice.kl"
   ]
 }

@@ -1,0 +1,29 @@
+/*
+ *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
+ */
+
+struct ovrTrackingState {
+  /// Predicted head pose (and derivatives) at the requested absolute time.
+  /// The look-ahead interval is equal to (HeadPose.TimeInSeconds - RawSensorData.TimeInSeconds).
+  ovrPoseState HeadPose;
+
+  /// Current pose of the external camera (if present).
+  /// This pose includes camera tilt (roll and pitch). For a leveled coordinate
+  /// system use LeveledCameraPose.
+  ovrPose CameraPose;
+
+  /// Camera frame aligned with gravity.
+  /// This value includes position and yaw of the camera, but not roll and pitch.
+  /// It can be used as a reference point to render real-world objects in the correct location.
+  ovrPose LeveledCameraPose;
+
+  /// The most recent sensor data received from the HMD.
+  ovrSensorData RawSensorData;
+
+  /// Tracking status described by ovrStatusBits.
+  Size StatusFlags;
+
+  //// 0.4.1
+  /// Time spent processing the last vision frame
+  Float64 LastVisionProcessingTime;
+};

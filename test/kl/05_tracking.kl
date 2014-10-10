@@ -6,4 +6,11 @@ operator entry() {
   device.configureTracking(ovrTrackingCap_Orientation |
     ovrTrackingCap_MagYawCorrection |
     ovrTrackingCap_Position, 0);
+
+  ovrTrackingState ts = device.getTrackingState(device.getTimeInSeconds());
+  while(!(ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked))) {
+    ts = device.getTrackingState(device.getTimeInSeconds());
+  }
+
+  report('received first tracking state.');
 }

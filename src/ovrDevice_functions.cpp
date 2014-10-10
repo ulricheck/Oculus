@@ -7,8 +7,9 @@
 #include <OVR.h>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
+#include "conversion.h"
 
- using namespace Fabric::EDK;
+using namespace Fabric::EDK;
 
 typedef boost::shared_mutex Lock;
 typedef boost::unique_lock< Lock >  WriteLock;
@@ -149,6 +150,24 @@ FABRIC_EXT_EXPORT void ovrDevice_GetDescription(
   _result.DisplayId = hmd->DisplayId;
 }
 
+// Defined at src\ovrDevice.kl:52:1
+FABRIC_EXT_EXPORT KL::Float64 ovrDevice_GetTimeInSeconds(
+  KL::Traits< KL::ovrDevice >::INParam this_
+) {
+  if(numOvrDevices)
+    return ovr_GetTimeInSeconds();
+  return 0.0;
+}
+
+// Defined at src\ovrDevice.kl:55:1
+FABRIC_EXT_EXPORT void ovrDevice_WaitTillTime(
+  KL::Traits< KL::ovrDevice >::IOParam this_,
+  KL::Traits< KL::Float64 >::INParam absTime
+) {
+  if(numOvrDevices)
+    ovr_WaitTillTime(absTime);
+}
+
 // Defined at src\ovrDevice.kl:61:1
 FABRIC_EXT_EXPORT KL::Boolean ovrDevice_ConfigureTracking(
   KL::Traits< KL::ovrDevice >::IOParam this_,
@@ -165,4 +184,18 @@ FABRIC_EXT_EXPORT KL::Boolean ovrDevice_ConfigureTracking(
     }
   }
   return false;
+}
+
+// Defined at src\ovrDevice.kl:76:1
+FABRIC_EXT_EXPORT void ovrDevice_getTrackingState(
+  KL::Traits< KL::ovrTrackingState >::Result _result,
+  KL::Traits< KL::ovrDevice >::INParam this_,
+  KL::Traits< KL::Float64 >::INParam absTime
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+
+  ovrTrackingState ts = ovrHmd_GetTrackingState(hmd, absTime);
+  convert(ts, _result);
 }
