@@ -5,6 +5,8 @@
 object ovrDevice {
   /// internal
   Data handle;
+  /// internal
+  Boolean configured;
 };
 
 alias Integer ovrTrackingCap;
@@ -18,17 +20,6 @@ const Integer ovrTrackingCap_Position = 0x0040;
 ///  doesn't care about tracking settings. This is the internal
 ///  default before ovrDevice.configureTracking is called.
 const Integer ovrTrackingCap_Idle = 0x0100;
-
-/// Orientation is currently tracked (connected and in use).
-const Integer ovrStatus_OrientationTracked = 0x0001;
-/// Position is currently tracked (false if out of range).
-const Integer ovrStatus_PositionTracked = 0x0002;
-/// Camera pose is currently tracked.
-const Integer ovrStatus_CameraPoseTracked = 0x0004;
-/// Position tracking hardware is connected.
-const Integer ovrStatus_PositionConnected = 0x0020;
-/// HMD Display is available and connected.
-const Integer ovrStatus_HmdConnected = 0x0080;
 
 /// constructor given a device index
 function ovrDevice(Index index) {
@@ -65,6 +56,11 @@ function Float64 ovrDevice.getTimeInSeconds() = "ovrDevice_GetTimeInSeconds";
 /// Waits until the specified absolute time.
 function ovrDevice.waitTillTime!(Float64 absTime) = "ovrDevice_WaitTillTime";
 
+/// returns true if this device has been configured for tracking yet
+function Boolean ovrDevice.isConfigured() {
+  return this.configured; 
+}
+
 /// All tracking interface functions are thread-safe, allowing tracking state to be sampled
 /// from different threads.
 /// ConfigureTracking starts sensor sampling, enabling specified capabilities,
@@ -79,9 +75,21 @@ function ovrDevice.waitTillTime!(Float64 absTime) = "ovrDevice_WaitTillTime";
 ///  - Pass 0 for both supportedTrackingCaps and requiredTrackingCaps to disable tracking.
 function Boolean ovrDevice.configureTracking!(ovrTrackingCap supportedTrackingCaps, ovrTrackingCap requiredTrackingCaps) = "ovrDevice_ConfigureTracking";
 
+/// simple overload for configureTracking with a default setup of capabilities
+function Boolean ovrDevice.configureTracking!() {
+  return this.configureTracking(ovrTrackingCap_Orientation |
+    ovrTrackingCap_MagYawCorrection |
+    ovrTrackingCap_Position, 0);
+}
+
 /// Returns tracking state reading based on the specified absolute system time.
 /// Pass an absTime value of 0.0 to request the most recent sensor reading. In this case
 /// both PredictedPose and SamplePose will have the same value.
 /// ovrDevice.GetEyePose relies on this internally.
 /// This may also be used for more refined timing of FrontBuffer rendering logic, etc.
 function ovrTrackingState ovrDevice.getTrackingState(Float64 absTime) = "ovrDevice_getTrackingState";
+
+/// simple overload for getTrackingState using the device's current time
+function ovrTrackingState ovrDevice.getTrackingState() {
+  return this.getTrackingState(this.getTimeInSeconds());
+}

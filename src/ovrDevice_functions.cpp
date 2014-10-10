@@ -54,6 +54,7 @@ FABRIC_EXT_EXPORT void ovrDevice_Construct(
     report("Using debug device of type ovrHmd_DK2.");
     this_->handle = (void*)ovrHmd_CreateDebug(ovrHmd_DK2);
   }
+  this_->configured = false;
 }
 
 // Defined at src\ovrDevice.kl:28:1
@@ -181,6 +182,8 @@ FABRIC_EXT_EXPORT KL::Boolean ovrDevice_ConfigureTracking(
     if(ovrHmd_ConfigureTracking(hmd, supportedTrackingCaps, requiredTrackingCaps))
     {
       report("Oculus Rift configured for tracking.");
+      this_->configured = true;
+      return true;
     }
   }
   return false;
