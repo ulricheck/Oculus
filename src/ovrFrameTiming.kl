@@ -1,0 +1,30 @@
+/*
+ *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
+ */
+
+struct ovrFrameTiming {
+  /// The amount of time that has passed since the previous frame's
+  /// ThisFrameSeconds value (usable for movement scaling).
+  /// This will be clamped to no more than 0.1 seconds to prevent
+  /// excessive movement after pauses due to loading or initialization.
+  Float32 DeltaSeconds;
+
+  /// It is generally expected that the following holds:
+  /// ThisFrameSeconds < TimewarpPointSeconds < NextFrameSeconds < 
+  /// EyeScanoutSeconds[EyeOrder[0]] <= ScanoutMidpointSeconds <= EyeScanoutSeconds[EyeOrder[1]].
+
+  /// Absolute time value when rendering of this frame began or is expected to
+  /// begin. Generally equal to NextFrameSeconds of the previous frame. Can be used
+  /// for animation timing.
+  Float64 ThisFrameSeconds;
+  /// Absolute point when IMU expects to be sampled for this frame.
+  Float64 TimewarpPointSeconds;
+  /// Absolute time when frame Present followed by GPU Flush will finish and the next frame begins.
+  Float64 NextFrameSeconds;
+
+  /// Time when when half of the screen will be scanned out. Can be passed as an absolute time
+  /// to ovrDevice.getTrackingState() to get the predicted general orientation.
+  Float64 ScanoutMidpointSeconds;
+  /// Timing points when each eye will be scanned out to display. Used when rendering each eye.
+  Float64 EyeScanoutSeconds[2];
+};

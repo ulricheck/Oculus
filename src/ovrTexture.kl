@@ -1,0 +1,29 @@
+/*
+ *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
+ */
+
+alias Integer ovrRenderAPIType;
+const Integer ovrRenderAPI_None = 0;
+const Integer ovrRenderAPI_OpenGL = 1;
+const Integer ovrRenderAPI_Android_GLES = 2;
+const Integer ovrRenderAPI_D3D9 = 3;
+const Integer ovrRenderAPI_D3D10 = 4;
+const Integer ovrRenderAPI_D3D11 = 5;
+const Integer ovrRenderAPI_Count = 6;
+
+/// Platform-independent part of the eye texture descriptor.
+/// It is a part of ovrTexture, passed to ovrHmd_EndFrame.
+/// If RenderViewport is all zeros then the full texture will be used.
+struct ovrTextureHeader
+{
+  ovrRenderAPIType API;
+  ovrSize TextureSize;
+  // Pixel viewport in texture that holds eye image.
+  ovrRect RenderViewport;
+};
+
+/// Contains platform-specific information about a texture.
+struct ovrTexture
+{
+  ovrTextureHeader Header;
+};
