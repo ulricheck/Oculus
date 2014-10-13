@@ -7,6 +7,7 @@
 
 #include "Oculus.h"
 #include <OVR.h>
+#include <../Src/OVR_CAPI_GL.h>
 
 namespace Fabric
 {
@@ -102,12 +103,6 @@ namespace Fabric
       b.LastVisionProcessingTime = a.LastVisionProcessingTime;
     }
 
-    void convert(KL::ovrTexture a, ovrTexture & b) {
-      b.Header.API = (ovrRenderAPIType)a.Header.API;
-      convert(a.Header.TextureSize, b.Header.TextureSize);
-      convert(a.Header.RenderViewport, b.Header.RenderViewport);
-    }
-
     void convert(KL::ovrEyeRenderDesc a, ovrEyeRenderDesc & b) {
       b.Eye = (ovrEyeType)a.Eye;
       convert(a.Fov, b.Fov);
@@ -116,10 +111,28 @@ namespace Fabric
       convert(a.ViewAdjust, b.ViewAdjust);
     }
 
-    void convert(KL::ovrRenderAPIConfig a, ovrRenderAPIConfig & b) {
-      b.Header.API = (ovrRenderAPIType)a.Header.API;
-      convert(a.Header.RTSize, b.Header.RTSize);
-      b.Header.Multisample = a.Header.Multisample;
+    void convert(KL::ovrGLTexture a, ovrTexture & b) {
+      b.Header.API = (ovrRenderAPIType)a.API;
+      convert(a.TextureSize, b.Header.TextureSize);
+      convert(a.RenderViewport, b.Header.RenderViewport);
+
+      ovrGLTexture * bGL = (ovrGLTexture*)&b;
+      bGL->OGL.TexId = a.TexId;
+    }
+
+    void convert(KL::ovrGLConfig a, ovrRenderAPIConfig & b) {
+      b.Header.API = (ovrRenderAPIType)a.API;
+      convert(a.RTSize, b.Header.RTSize);
+      b.Header.Multisample = a.Multisample;
+
+      ovrGLConfig * bGL = (ovrGLConfig*)&b;
+#if defined(OVR_OS_WIN32)
+      bGL->OGL.Window = (HWND)a.Window;
+      bGL->OGL.DC = (HDC)a.DC;
+#elif defined(OVR_OS_LINUX)
+      bGL->OGL.Disp = (_XDisplay*)a.Disp;
+      bGL->OGL.Win = (Window)a.Win;
+#endif
     }
 
     void convert(KL::ovrFrameTiming a, ovrFrameTiming & b) {
@@ -224,12 +237,6 @@ namespace Fabric
       b.LastVisionProcessingTime = a.LastVisionProcessingTime;
     }
 
-    void convert(ovrTexture a, KL::ovrTexture & b) {
-      b.Header.API = a.Header.API;
-      convert(a.Header.TextureSize, b.Header.TextureSize);
-      convert(a.Header.RenderViewport, b.Header.RenderViewport);
-    }
-
     void convert(ovrEyeRenderDesc a, KL::ovrEyeRenderDesc & b) {
       b.Eye = a.Eye;
       convert(a.Fov, b.Fov);
@@ -238,12 +245,30 @@ namespace Fabric
       convert(a.ViewAdjust, b.ViewAdjust);
     }
 
-    void convert(ovrRenderAPIConfig a, KL::ovrRenderAPIConfig & b) {
-      b.Header.API = a.Header.API;
-      convert(a.Header.RTSize, b.Header.RTSize);
-      b.Header.Multisample = a.Header.Multisample;
+    void convert(const ovrTexture & a, KL::ovrGLTexture & b) {
+      b.API = a.Header.API;
+      convert(a.Header.TextureSize, b.TextureSize);
+      convert(a.Header.RenderViewport, b.RenderViewport);
+
+      ovrGLTexture * aGL = (ovrGLTexture*)&a;
+      b.TexId = aGL->OGL.TexId;
     }
 
+    void convert(ovrRenderAPIConfig a, KL::ovrGLConfig & b) {
+      b.API = a.Header.API;
+      convert(a.Header.RTSize, b.RTSize);
+      b.Multisample = a.Header.Multisample;
+
+      ovrGLConfig * aGL = (ovrGLConfig*)&a;
+#if defined(OVR_OS_WIN32)
+      b.Window = (KL::UInt64)aGL->OGL.Window;
+      b.DC = (KL::UInt64)aGL->OGL.DC;
+#elif defined(OVR_OS_LINUX)
+      b.Disp = (KL::UInt64)aGL->OGL.Disp;
+      b.Win = (KL::UInt64)aGL->OGL.Win;
+#endif
+    }
+    
     void convert(ovrFrameTiming a, KL::ovrFrameTiming & b) {
       b.DeltaSeconds = a.DeltaSeconds;
       b.ThisFrameSeconds = a.ThisFrameSeconds;

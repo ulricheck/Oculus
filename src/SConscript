@@ -1,6 +1,7 @@
 #
 # Copyright 2010-2014 Fabric Software Inc. All rights reserved.
 #
+import platform
 Import('parentEnv', 'kl2edk', 'kl', 'extSuffix', 'STAGE_DIR')
 
 extName = 'Oculus'

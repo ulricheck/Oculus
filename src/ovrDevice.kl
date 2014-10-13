@@ -75,11 +75,9 @@ function Boolean ovrDevice.isConfigured() {
 ///  - Pass 0 for both supportedTrackingCaps and requiredTrackingCaps to disable tracking.
 function Boolean ovrDevice.configureTracking!(ovrTrackingCap supportedTrackingCaps, ovrTrackingCap requiredTrackingCaps) = "ovrDevice_ConfigureTracking";
 
-/// simple overload for configureTracking with a default setup of capabilities
+/// simple overload for configureTracking with a default setup of capabilities (and anything they might add in the future)
 function Boolean ovrDevice.configureTracking!() {
-  return this.configureTracking(ovrTrackingCap_Orientation |
-    ovrTrackingCap_MagYawCorrection |
-    ovrTrackingCap_Position, 0);
+  return this.configureTracking(0xffffffff, 0);
 }
 
 /// Returns tracking state reading based on the specified absolute system time.
@@ -102,6 +100,15 @@ function ovrDevice.recenterPose!() = "ovrDevice_RecenterPose";
 /// Returns last error for HMD state. Returns empty string for no error.
 function String ovrDevice.getLastError() = "ovrDevice_GetLastError";
 
+/// Returns capability bits that are enabled at this time as described by ovrHmdCaps.
+/// Note that this value is different font ovrHmdDesc::HmdCaps, which describes what
+/// capabilities are available for that HMD.
+function UInt32 ovrDevice.GetEnabledCaps() = "ovrDevice_GetEnabledCaps";
+
+/// Modifies capability bits described by ovrHmdCaps that can be modified,
+/// such as ovrDevice.LowPersistance.
+function ovrDevice.SetEnabledCaps(UInt32 hmdCaps) = "ovrDevice_SetEnabledCaps";
+
 /// Configures rendering and fills in computed render parameters.
 /// This function can be called multiple times to change rendering settings.
 /// eyeRenderDescOut is a pointer to an array of two ovrEyeRenderDesc structs
@@ -111,10 +118,13 @@ function String ovrDevice.getLastError() = "ovrDevice_GetLastError";
 ///    to shutdown rendering and release all resources.
 ///  - distortionCaps describe desired distortion settings.
 ///
-function Boolean ovrDevice.configureRendering!(ovrRenderAPIConfig config, Integer distortionCaps, ovrFovPort eyeFovIn[2], ovrEyeRenderDesc eyeRenderDescOut[2] ) = "ovrDevice_ConfigureRendering";
+function Boolean ovrDevice.configureRendering!(ovrGLConfig config, Integer distortionCaps, ovrFovPort eyeFovIn[2], ovrEyeRenderDesc eyeRenderDescOut[2] ) = "ovrDevice_ConfigureRendering";
 
 /// disable SDK based rendering
 function Boolean ovrDevice.disableRendering!() = "ovrDevice_DisableRendering";
+
+/// get the recommended texture size for both eyes
+function ovrSize ovrDevice.getFovTextureSize(ovrEyeType eye) = "ovrDevice_getFovTextureSize";
 
 /// Begins a frame, returning timing information.
 /// This should be called at the beginning of the game rendering loop (on the render thread).
@@ -129,7 +139,7 @@ function ovrFrameTiming ovrDevice.beginFrame!(Size frameIndex) = "ovrDevice_Begi
 ///   delegated to another thread. 
 /// - Must be called on the same thread as BeginFrame.
 /// - *** This Function will call Present/SwapBuffers and potentially wait for GPU Sync ***.
-function ovrDevice.endFrame!(ovrPose renderPose[2], ovrTexture eyeTexture[2]) = "ovrDevice_EndFrame";
+function ovrDevice.endFrame!(ovrPose renderPose[2], ovrGLTexture eyeTexture[2]) = "ovrDevice_EndFrame";
 
 /// Returns the predicted head pose to use when rendering the specified eye.
 /// - Must be called between ovrDevice.beginFrameTiming and ovrDevice.endFrameTiming.

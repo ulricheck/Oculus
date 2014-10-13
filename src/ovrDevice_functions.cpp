@@ -4,7 +4,6 @@
 
 #include <FabricEDK.h>
 #include "ovrDevice_functions.h"
-#include <OVR.h>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include "conversion.h"
@@ -16,19 +15,20 @@ typedef boost::unique_lock< Lock >  WriteLock;
 typedef boost::shared_lock< Lock >  ReadLock;
 Lock gLock;
 
-unsigned int numOvrDevices = 0;
-
 void ContextCallback(bool opening, void const *contextPtr)
 {
-  if ( !opening )
+  if ( opening )
   {
     WriteLock w_lock(gLock);
-    if(numOvrDevices > 0)
-    {
-      ovr_Shutdown();
-      report("Oculus Rift finalized.");
-    }
-    numOvrDevices = 0;
+    printf("Oculus Rift starting...\n");
+    ovr_Initialize();
+    printf("Oculus Rift initialized.\n");
+  }
+  else
+  {
+    WriteLock w_lock(gLock);
+    ovr_Shutdown();
+    printf("Oculus Rift finalized.\n");
   }
 }
 IMPLEMENT_FABRIC_EDK_ENTRIES_WITH_CONTEXT_CALLBACK( Oculus, &ContextCallback )
@@ -40,13 +40,6 @@ FABRIC_EXT_EXPORT void ovrDevice_Construct(
 ) {
 
   WriteLock w_lock(gLock);
-
-  if(numOvrDevices == 0)
-  {
-    ovr_Initialize();
-    report("Oculus Rift initialized.");
-  }
-  numOvrDevices++;
 
   this_->handle = (void*)ovrHmd_Create(index);
   if(!this_->handle)
@@ -66,13 +59,6 @@ FABRIC_EXT_EXPORT void ovrDevice_Destruct(
 
   if(this_->handle)
     ovrHmd_Destroy((ovrHmd)this_->handle);
-
-  if(numOvrDevices == 1)
-  {
-    ovr_Shutdown();
-    report("Oculus Rift finalized.");
-  }
-  numOvrDevices--;
 }
 
 // Defined at src\ovrDevice.kl:30:1
@@ -141,9 +127,7 @@ FABRIC_EXT_EXPORT void ovrDevice_GetDescription(
 FABRIC_EXT_EXPORT KL::Float64 ovrDevice_GetTimeInSeconds(
   KL::Traits< KL::ovrDevice >::INParam this_
 ) {
-  if(numOvrDevices)
-    return ovr_GetTimeInSeconds();
-  return 0.0;
+  return ovr_GetTimeInSeconds();
 }
 
 // Defined at src\ovrDevice.kl:55:1
@@ -151,8 +135,28 @@ FABRIC_EXT_EXPORT void ovrDevice_WaitTillTime(
   KL::Traits< KL::ovrDevice >::IOParam this_,
   KL::Traits< KL::Float64 >::INParam absTime
 ) {
-  if(numOvrDevices)
-    ovr_WaitTillTime(absTime);
+  ovr_WaitTillTime(absTime);
+}
+
+// Defined at src\ovrDevice.kl:108:1
+FABRIC_EXT_EXPORT KL::UInt32 ovrDevice_GetEnabledCaps(
+  KL::Traits< KL::ovrDevice >::INParam this_
+) {
+  if(!this_->handle)
+    return 0;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  return ovrHmd_GetEnabledCaps(hmd);
+}
+
+// Defined at src\ovrDevice.kl:112:1
+FABRIC_EXT_EXPORT void ovrDevice_SetEnabledCaps(
+  KL::Traits< KL::ovrDevice >::INParam this_,
+  KL::Traits< KL::UInt32 >::INParam hmdCaps
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  return ovrHmd_SetEnabledCaps(hmd, hmdCaps);
 }
 
 // Defined at src\ovrDevice.kl:61:1
@@ -218,7 +222,7 @@ FABRIC_EXT_EXPORT void ovrDevice_GetLastError(
 // Defined at src\ovrDevice.kl:114:1
 FABRIC_EXT_EXPORT KL::Boolean ovrDevice_ConfigureRendering(
   KL::Traits< KL::ovrDevice >::IOParam this_,
-  KL::Traits< KL::ovrRenderAPIConfig >::INParam config,
+  KL::Traits< KL::ovrGLConfig >::INParam config,
   KL::Traits< KL::SInt32 >::INParam distortionCaps,
   KL::Traits< KL::FixedArray< KL::ovrFovPort, 2 > >::INParam eyeFovIn,
   KL::Traits< KL::FixedArray< KL::ovrEyeRenderDesc, 2 > >::INParam eyeRenderDescOut
@@ -251,6 +255,19 @@ FABRIC_EXT_EXPORT KL::Boolean ovrDevice_DisableRendering(
 }
 
 // Defined at src\ovrDevice.kl:120:1
+FABRIC_EXT_EXPORT void ovrDevice_getFovTextureSize(
+  KL::Traits< KL::ovrSize >::Result _result,
+  KL::Traits< KL::ovrDevice >::INParam this_,
+  KL::Traits< KL::SInt32 >::INParam eye
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  ovrSizei result = ovrHmd_GetFovTextureSize(hmd, (ovrEyeType)eye,  hmd->DefaultEyeFov[eye], 1.0f);
+  convert(result, _result);
+}
+
+// Defined at src\ovrDevice.kl:120:1
 FABRIC_EXT_EXPORT void ovrDevice_BeginFrame(
   KL::Traits< KL::ovrFrameTiming >::Result _result,
   KL::Traits< KL::ovrDevice >::IOParam this_,
@@ -267,7 +284,7 @@ FABRIC_EXT_EXPORT void ovrDevice_BeginFrame(
 FABRIC_EXT_EXPORT void ovrDevice_EndFrame(
   KL::Traits< KL::ovrDevice >::IOParam this_,
   KL::Traits< KL::FixedArray< KL::ovrPose, 2 > >::INParam renderPose,
-  KL::Traits< KL::FixedArray< KL::ovrTexture, 2 > >::INParam eyeTexture
+  KL::Traits< KL::FixedArray< KL::ovrGLTexture, 2 > >::INParam eyeTexture
 ) {
   if(!this_->handle)
     return;

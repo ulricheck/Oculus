@@ -1,0 +1,15 @@
+/*
+ *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
+ */
+
+/// Contains platform-specific information for rendering.
+struct ovrGLConfig
+{
+  ovrRenderAPIType API;
+  ovrSize RTSize;
+  Integer Multisample;
+  /// The optional window handle. If unset, rendering will use the current window.
+  UInt64 Window;
+  /// The optional device context. If unset, rendering will use a new context.
+  UInt64 DC;
+};
