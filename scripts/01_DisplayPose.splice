@@ -1,1 +1,70 @@
-{"version":"1013001","info":{"hostAppName":"Splice Standalone","hostAppVersion":"1.0"},"nodes":[{"name":"DGNode","dependencies":{},"bindings":[{"operator":{"name":"oculusOp","entry":"oculusOp","filename":"oculusOp.kl","kl":"require InlineDrawing;\nrequire Oculus;\n\noperator oculusOp(io DrawingHandle handle, io ovrDevice or, in Scalar time)\n{\n  if(!or.isConfigured()) {\n    or.configureTracking();\n    ovrViewportCallback callback(or);\n    callback.registerForViewport();\n    \n  }\n    \n  if(handle.isEmpty()) {\n    InlineDrawing draw = handle.getDrawing();\n    InlineTransform transform = StaticInlineTransform('or', handle.getRootTransform(), Xfo());\n    InlineDebugShape shape = InlineDebugShape();\n    shape.drawLine(Vec3(-1, 0, 0), Vec3(1, 0, 0));\n    shape.drawLine(Vec3(0, -1, 0), Vec3(0, 1, 0));\n    shape.drawLine(Vec3(0, 0, -1), Vec3(0, 0, 1));\n    InlineInstance instance = SimpleInlineInstance('or', transform, shape);\n    \n    InlineShader shader = draw.registerShader(OGLFlatShader());\n    InlineMaterial mat = shader.getOrCreateMaterial('red');\n    instance.addMaterial(mat);\n  }\n    \n  ovrTrackingState ts = or.getTrackingState();\n  if(ts.hasTrackedPose()) {\n    InlineTransform transform = handle.getRootTransform().getChild('or');\n    \n    ovrPose pose = ts.HeadPose.ThePose;\n    Xfo xfo;\n    xfo.tr = pose.Position * 125.0;\n    xfo.ori = pose.Orientation;\n    xfo.sc *= 3.0;\n    transform.setLocalXfo(0, xfo);\n  }\n}\n","portmap":{}}}]}],"extensions":["Oculus"],"ports":[{"name":"handle","node":"DGNode","graph":"01_DisplayPose","type":"DrawingHandle","autoInitObjects":true,"member":"handle","mode":"io","persistence":false},{"name":"or","node":"DGNode","graph":"01_DisplayPose","type":"ovrDevice","autoInitObjects":true,"member":"or","mode":"io","persistence":false},{"name":"time","node":"DGNode","graph":"01_DisplayPose","type":"Scalar","autoInitObjects":true,"member":"time","mode":"in","persistence":false}]}
+{
+  "version": "1013001",
+  "info": {
+    "hostAppName": "Splice Standalone",
+    "hostAppVersion": "1.0"
+  },
+  "nodes": [
+    {
+      "name": "DGNode",
+      "dependencies": {},
+      "bindings": [
+        {
+          "operator": {
+            "name": "oculusOp",
+            "entry": "oculusOp",
+            "filename": "oculusOp.kl",
+            "kl": "require InlineDrawing;\nrequire Oculus;\nrequire SpliceStandalone;\nrequire Singletons;\n\noperator oculusOp(io DrawingHandle handle, io ovrDevice or, in Scalar time, in Boolean stereo)\n{\n  if(!or.isConfigured()) {\n    or.configureTracking();\n    ovrViewportCallback callback(or);\n    callback.registerForViewport();\n  }\n  \n  or.setStereEnabled(stereo);\n  \n  if(handle.isEmpty()) {\n    //InlineDrawing draw = handle.getDrawing();\n    //InlineTransform transform = StaticInlineTransform('or', handle.getRootTransform(), Xfo());\n    //InlineDebugShape shape = InlineDebugShape();\n    //shape.drawLine(Vec3(-1, 0, 0), Vec3(1, 0, 0));\n    //shape.drawLine(Vec3(0, -1, 0), Vec3(0, 1, 0));\n    //shape.drawLine(Vec3(0, 0, -1), Vec3(0, 0, 1));\n    //InlineInstance instance = SimpleInlineInstance('or', transform, shape);\n    \n    //InlineShader shader = draw.registerShader(OGLFlatShader());\n    //InlineMaterial mat = shader.getOrCreateMaterial('red');\n    //instance.addMaterial(mat);\n  }\n    \n}\n",
+            "portmap": {}
+          }
+        }
+      ]
+    }
+  ],
+  "extensions": [
+    "Oculus"
+  ],
+  "ports": [
+    {
+      "name": "handle",
+      "node": "DGNode",
+      "graph": "01_DisplayPose",
+      "type": "DrawingHandle",
+      "autoInitObjects": true,
+      "member": "handle",
+      "mode": "io",
+      "persistence": false
+    },
+    {
+      "name": "or",
+      "node": "DGNode",
+      "graph": "01_DisplayPose",
+      "type": "ovrDevice",
+      "autoInitObjects": true,
+      "member": "or",
+      "mode": "io",
+      "persistence": false
+    },
+    {
+      "name": "stereo",
+      "node": "DGNode",
+      "graph": "01_DisplayPose",
+      "type": "Boolean",
+      "autoInitObjects": true,
+      "member": "stereo",
+      "mode": "in",
+      "persistence": false,
+      "default": "true"
+    },
+    {
+      "name": "time",
+      "node": "DGNode",
+      "graph": "01_DisplayPose",
+      "type": "Scalar",
+      "autoInitObjects": true,
+      "member": "time",
+      "mode": "in",
+      "persistence": false
+    }
+  ]
+}

@@ -37,6 +37,7 @@ sources = [
 sources += env.Glob('*.kl')
 
 cppFiles = [
+  env.File('conversion.cpp'),
   env.File('ovrDevice_functions.cpp')
 ]
 

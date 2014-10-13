@@ -48,6 +48,7 @@ FABRIC_EXT_EXPORT void ovrDevice_Construct(
     this_->handle = (void*)ovrHmd_CreateDebug(ovrHmd_DK2);
   }
   this_->configured = false;
+  this_->stereoEnabled = true;
 }
 
 // Defined at src\ovrDevice.kl:28:1
@@ -177,6 +178,22 @@ FABRIC_EXT_EXPORT KL::Boolean ovrDevice_ConfigureTracking(
     }
   }
   return false;
+}
+
+// Defined at src\ovrDevice.kl:142:1
+FABRIC_EXT_EXPORT KL::Boolean ovrDevice_AttachToWindow(
+  KL::Traits< KL::ovrDevice >::INParam this_,
+  KL::Traits< KL::UInt64 >::INParam window
+) {
+  if(!this_->handle)
+    return false;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+
+#ifdef WIN32
+  return ovrHmd_AttachToWindow(hmd, (void*)window, 0, 0);
+#else
+  return false;
+#endif
 }
 
 // Defined at src\ovrDevice.kl:76:1
@@ -358,4 +375,16 @@ FABRIC_EXT_EXPORT void ovrDevice_ResetFrameTiming(
     return;
   ovrHmd hmd = (ovrHmd)this_->handle;
   ovrHmd_ResetFrameTiming(hmd, frameIndex);
+}
+
+// Defined at src\ovrDevice.kl:196:1
+FABRIC_EXT_EXPORT void ovrDevice_EnableHSWDisplaySDKRender(
+  KL::Traits< KL::ovrDevice >::INParam this_,
+  KL::Traits< KL::Boolean >::INParam enabled
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+  // todo
+  // ovrhmd_EnableHSWDisplaySDKRender(hmd, enabled);
 }
