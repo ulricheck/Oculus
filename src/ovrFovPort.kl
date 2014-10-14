@@ -12,3 +12,11 @@ struct ovrFovPort {
   /// The tangent of the angle between the viewing vector and the right edge of the field of view.
   Scalar RightTan;
 };
+
+function Float32 ovrFovPort.getVerticalFovRadians() {
+  return atan(this.UpTan) + atan(this.DownTan);
+}
+
+function Float32 ovrFovPort.getHorizontalFovRadians() {
+  return atan(this.LeftTan) + atan(this.RightTan);
+}

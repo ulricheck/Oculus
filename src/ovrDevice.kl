@@ -227,9 +227,12 @@ function ovrDevice.endFrameTiming!() = "ovrDevice_EndFrameTiming";
 /// isn't called. Resets internal frame index to the specified number.
 function ovrDevice.resetFrameTiming(Size frameIndex) = "ovrDevice_ResetFrameTiming";
 
-// Normally if an application uses SDK-based distortion rendering 
-// (ovrDevice.BeginFrame / ovrDevice.EndFrame) then the SDK also takes care of 
-// drawing the health and safety warning. If an application is using 
-// SDK-based rendering but wants to draw the warning display itself, 
-// it call this function with enabled set to false.
+/// Normally if an application uses SDK-based distortion rendering 
+/// (ovrDevice.BeginFrame / ovrDevice.EndFrame) then the SDK also takes care of 
+/// drawing the health and safety warning. If an application is using 
+/// SDK-based rendering but wants to draw the warning display itself, 
+/// it call this function with enabled set to false.
 function ovrDevice.enableHSWDisplaySDKRender(Boolean enabled) = "ovrDevice_EnableHSWDisplaySDKRender";
+
+/// Returns the projection for a given eye
+function Mat44 ovrDevice.getProjection(ovrEyeType eye, Float32 znear, Float32 zfar, Boolean rightHanded) = "ovrDevice_getProjection";

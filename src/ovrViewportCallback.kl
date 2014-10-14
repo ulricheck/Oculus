@@ -11,14 +11,13 @@ object ovrViewportCallback : SpliceStandaloneViewportCallback {
   UInt32 fbo[];
   UInt32 fb_width;
   UInt32 fb_height;
-  UInt32 fb_tex_width;
-  UInt32 fb_tex_height;
   UInt32 fb_tex[];
   UInt32 fb_depth[];
   ovrGLTexture fb_ovr_tex[2];
   ovrGLConfig cfg;
   ovrEyeRenderDesc eye_rdesc[2];
   ovrPose poses[2];
+  Vec3 offset;
 };
 
 function ovrViewportCallback() {
@@ -48,50 +47,15 @@ function ovrViewportCallback.registerForViewport!() {
   }
 }
 
-/*
-const SpliceStandaloneViewportPhase SpliceStandaloneViewportPhase_Initialize = 0;
-const SpliceStandaloneViewportPhase SpliceStandaloneViewportPhase_Resize = 1;
-const SpliceStandaloneViewportPhase SpliceStandaloneViewportPhase_BeforePaint = 2;
-const SpliceStandaloneViewportPhase SpliceStandaloneViewportPhase_Paint = 3;
-const SpliceStandaloneViewportPhase SpliceStandaloneViewportPhase_AfterPaint = 4;
-*/
-
-function UInt32 next_pow2(UInt32 x) {
-  UInt32 y = x - 1;
-  y |= y >> 1;
-  y |= y >> 2;
-  y |= y >> 4;
-  y |= y >> 8;
-  y |= y >> 16;
-  return y + 1;
-}
-
 function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phase, io SpliceStandaloneViewport viewport) {
   switch(phase) {
     case SpliceStandaloneViewportPhase_Initialize: {
-
-      if(this.fbo[0])
-        return true;
-
-      // {
-      //   glGenRenderbuffers(1, this.fb_depth);        
-      //   glDeleteTextures(1, this.fb_tex);        
-      //   glDeleteFrameBuffers(1, this.fbo);        
-      // }
 
       ovrSize eyeRes[2];
       eyeRes[0] = this.device.getFovTextureSize(ovrEye_Left);
       eyeRes[1] = this.device.getFovTextureSize(ovrEye_Right);
       this.fb_width = eyeRes[0].w + eyeRes[1].w;
       this.fb_height = eyeRes[0].h > eyeRes[1].h ? eyeRes[0].h : eyeRes[1].h;
-      // this.fb_width = viewport.width;
-      // this.fb_height = viewport.height;
-
-      /* calculate the next power of two in both dimensions and use that as a texture size */
-      // this.fb_tex_width = next_pow2(this.fb_width);
-      // this.fb_tex_height = next_pow2(this.fb_height);
-      this.fb_tex_width = this.fb_width;
-      this.fb_tex_height = this.fb_height;
 
       glGenFramebuffers(1, this.fbo);
       glGenTextures(1, this.fb_tex);
@@ -106,40 +70,40 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
 
       /* create and attach the texture that will be used as a color buffer */
       glBindTexture(GL_TEXTURE_2D, this.fb_tex[0]);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this.fb_tex_width, this.fb_tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullData);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this.fb_width, this.fb_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullData);
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this.fb_tex[0], 0);
 
       /* create and attach the renderbuffer that will serve as our z-buffer */
       glBindRenderbuffer(GL_RENDERBUFFER, this.fb_depth[0]);
-      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, this.fb_tex_width, this.fb_tex_height);
+      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, this.fb_width, this.fb_height);
       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this.fb_depth[0]);
       if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         setError("incomplete framebuffer!");
       }
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      report("Created render target: "+this.fb_width+"x"+this.fb_height+" (texture size: "+this.fb_tex_width+"x"+this.fb_tex_height+")"+", (window size: "+this.desc.Resolution.w+"x"+this.desc.Resolution.h+")");
+      report("Created render target: "+this.fb_width+"x"+this.fb_height);
 
       /* fill in the ovrGLTexture structures that describe our render target texture */
       for(ovrEyeType i=0; i<ovrEye_Count; i++) {
         this.fb_ovr_tex[i].API = ovrRenderAPI_OpenGL;
-        this.fb_ovr_tex[i].TextureSize.w = this.fb_tex_width;
-        this.fb_ovr_tex[i].TextureSize.h = this.fb_tex_height;
+        this.fb_ovr_tex[i].TextureSize.w = this.fb_width;
+        this.fb_ovr_tex[i].TextureSize.h = this.fb_height;
 
         /* this next field is the only one that differs between the two eyes */
         this.fb_ovr_tex[i].RenderViewport.Pos.x = i == 0 ? 0 : this.fb_width / 2.0;
-        this.fb_ovr_tex[i].RenderViewport.Pos.y = this.fb_tex_height - this.fb_height;
+        this.fb_ovr_tex[i].RenderViewport.Pos.y = this.fb_height - this.fb_height;
         this.fb_ovr_tex[i].RenderViewport.Size.w = this.fb_width / 2.0;
         this.fb_ovr_tex[i].RenderViewport.Size.h = this.fb_height;
         this.fb_ovr_tex[i].TexId = this.fb_tex[0]; /* both eyes will use the same texture id */
       } 
 
       this.cfg.API = ovrRenderAPI_OpenGL;
-      this.cfg.RTSize = this.desc.Resolution;
+      this.cfg.RTSize.w = viewport.width;
+      this.cfg.RTSize.h = viewport.height;
       this.cfg.Multisample = 1;      
       this.cfg.Window = viewport.windowId;
 
       /// on windows this will perform direct rendering
-      report(this.cfg);
       this.device.attachToWindow(this.cfg.Window);
 
       /* enable low-persistence display and dynamic prediction for lattency compensation */
@@ -147,18 +111,19 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
       
       /* configure SDK-rendering and enable chromatic abberation correction, vignetting, and
       * timewrap, which shifts the image before drawing to counter any lattency between the call
-      * to ovrDevice.GetEyePose and ovrDevice.EndFrame.
+      * to ovrDevice.getEyePose and ovrDevice.endFrame.
       */
       Integer dcaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette | ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive;
+      // Integer dcaps = 0;
       if(!this.device.configureRendering(this.cfg, dcaps, this.desc.DefaultEyeFov, this.eye_rdesc)) {
         setError("Failed to configure distortion renderer.");
       }
-      
+
       /* disable the retarded "health and safety warning" */
       this.device.enableHSWDisplaySDKRender(false);
       
       glEnable(GL_DEPTH_TEST);
-      glClearColor(0.1, 0.1, 0.3, 1);
+      glClearColor(0.7, 0.7, 0.7, 1);
 
       if(!viewport.gridInstance)
       {
@@ -175,20 +140,15 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
 
         InlineShader shader = drawing.registerShader(OGLFlatShader());
         InlineMaterial mat = shader.getOrCreateMaterial('grey');
-        mat.setUniform('u_color', Color(0.9, 0.9, 0.9));
+        mat.setUniform('u_color', Color(0.1, 0.1, 0.1));
         viewport.gridInstance = InlineInstance('StandaloneGrid', drawing.getRoot(), grid, mat);
       }
 
-      return true; // skip default behaviour
-    }
-    case SpliceStandaloneViewportPhase_Resize: {
-
-      return false; // skip default behaviour
-
+      return true;
     }
     case SpliceStandaloneViewportPhase_BeforePaint: {
 
-      /* the drawing starts with a call to ovrDevice.BeginFrame */
+      /* the drawing starts with a call to ovrDevice.beginFrame */
       if(this.device.isStereoEnabled()) {
         this.device.beginFrame(0);
 
@@ -197,7 +157,7 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
       }
 
       glViewport(0, 0, this.fb_width, this.fb_height);
-      glClearColor(0.0, 0.0, 0.5, 1);
+      glClearColor(0.7, 0.7, 0.7, 1);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       return true;
@@ -211,7 +171,9 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
       glMatrixMode(GL_MODELVIEW);
 
       /* for each eye ... */
-      for(ovrEyeType eye=0; eye<ovrEye_Count; eye++) {
+      for(ovrEyeType i=0; i<ovrEye_Count; i++) {
+
+        ovrEyeType eye = this.desc.EyeRenderOrder[i];
 
         if(this.device.isStereoEnabled())
           glViewport(eye == ovrEye_Left ? 0 : this.fb_width / 2, 0, this.fb_width / 2, this.fb_height);
@@ -220,12 +182,17 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
 
         Xfo camXfo;
         camXfo.ori = this.poses[eye].Orientation;
-        camXfo.tr = this.poses[eye].Position * 10;
+
+        if(eye == ovrEye_Left) {
+          this.offset += viewport.camera.velocity.x * camXfo.ori.getXaxis();
+          this.offset += viewport.camera.velocity.y * camXfo.ori.getYaxis();
+          this.offset += viewport.camera.velocity.z * camXfo.ori.getZaxis();
+        }
+
+        camXfo.tr = this.poses[eye].Position * 10 + this.offset;
         viewport.drawContext.viewport.camera.mat44 = camXfo.toMat44();
-        // todo
-        // viewport.drawContext.viewport.camera.fovY = this.camera.fovY;
-        // viewport.drawContext.viewport.camera.nearDistance = this.camera.nearValue;
-        // viewport.drawContext.viewport.camera.farDistance = this.camera.farValue;
+        if(this.device.isStereoEnabled())
+          viewport.drawContext.viewport.camera.projection = this.device.getProjection(eye, viewport.drawContext.viewport.camera.nearDistance, viewport.drawContext.viewport.camera.farDistance, true);
 
         /* finally draw the scene for this eye */
         drawing.draw(viewport.drawContext);
@@ -234,23 +201,23 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
           break;
       }
       
-      return true; // skip default behaviour
+      return true;
 
     }
     case SpliceStandaloneViewportPhase_AfterPaint: {
 
-      if(this.device.isStereoEnabled()) {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      if(!this.device.isStereoEnabled())
+        return false;
 
-        // glViewport(0, 0, this.desc.Resolution.w, this.desc.Resolution.h);
-        glViewport(0, 0, viewport.width, viewport.height);
-        glClearColor(0.0, 0.0, 0.0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        this.device.endFrame(this.poses, this.fb_ovr_tex);
-      }
+      glViewport(0, 0, viewport.width, viewport.height);
+      glClearColor(0.7, 0.7, 0.7, 1);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      return true; // skip default behaviour
+      this.device.endFrame(this.poses, this.fb_ovr_tex);
+
+      return true;
 
     }
   }

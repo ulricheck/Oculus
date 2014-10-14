@@ -2,11 +2,11 @@
  *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
  */
 
+#include "conversion.h"
 #include <FabricEDK.h>
 #include "ovrDevice_functions.h"
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
-#include "conversion.h"
 
 using namespace Fabric::EDK;
 
@@ -377,6 +377,12 @@ FABRIC_EXT_EXPORT void ovrDevice_ResetFrameTiming(
   ovrHmd_ResetFrameTiming(hmd, frameIndex);
 }
 
+/* forward declaration to avoid including non-public headers of libovr */
+extern "C"
+{
+  OVR_EXPORT void ovrhmd_EnableHSWDisplaySDKRender(ovrHmd hmd, ovrBool enabled);
+}
+
 // Defined at src\ovrDevice.kl:196:1
 FABRIC_EXT_EXPORT void ovrDevice_EnableHSWDisplaySDKRender(
   KL::Traits< KL::ovrDevice >::INParam this_,
@@ -385,6 +391,22 @@ FABRIC_EXT_EXPORT void ovrDevice_EnableHSWDisplaySDKRender(
   if(!this_->handle)
     return;
   ovrHmd hmd = (ovrHmd)this_->handle;
-  // todo
-  // ovrhmd_EnableHSWDisplaySDKRender(hmd, enabled);
+  ovrhmd_EnableHSWDisplaySDKRender(hmd, enabled);
+}
+
+// Defined at src\ovrDevice.kl:238:1
+FABRIC_EXT_EXPORT void ovrDevice_getProjection(
+  KL::Traits< KL::Mat44 >::Result _result,
+  KL::Traits< KL::ovrDevice >::INParam this_,
+  KL::Traits< KL::SInt32 >::INParam eye,
+  KL::Traits< KL::Float32 >::INParam znear,
+  KL::Traits< KL::Float32 >::INParam zfar,
+  KL::Traits< KL::Boolean >::INParam rightHanded
+) {
+  if(!this_->handle)
+    return;
+  ovrHmd hmd = (ovrHmd)this_->handle;
+
+  ovrMatrix4f result = ovrMatrix4f_Projection(hmd->DefaultEyeFov[eye], znear, zfar, rightHanded);
+  convert(result, _result);  
 }
