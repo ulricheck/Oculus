@@ -14,7 +14,7 @@
             "name": "oculusOp",
             "entry": "oculusOp",
             "filename": "oculusOp.kl",
-            "kl": "require InlineDrawing;\nrequire Oculus;\nrequire SpliceStandalone;\nrequire Singletons;\n\noperator oculusOp(io DrawingHandle handle, io ovrDevice or, in Scalar time, in Boolean stereo)\n{\n  if(!or.isConfigured()) {\n    or.configureTracking();\n    ovrViewportCallback callback(or);\n    callback.registerForViewport();\n  }\n  \n  or.setStereEnabled(stereo);\n  \n  if(handle.isEmpty()) {\n    //InlineDrawing draw = handle.getDrawing();\n    //InlineTransform transform = StaticInlineTransform('or', handle.getRootTransform(), Xfo());\n    //InlineDebugShape shape = InlineDebugShape();\n    //shape.drawLine(Vec3(-1, 0, 0), Vec3(1, 0, 0));\n    //shape.drawLine(Vec3(0, -1, 0), Vec3(0, 1, 0));\n    //shape.drawLine(Vec3(0, 0, -1), Vec3(0, 0, 1));\n    //InlineInstance instance = SimpleInlineInstance('or', transform, shape);\n    \n    //InlineShader shader = draw.registerShader(OGLFlatShader());\n    //InlineMaterial mat = shader.getOrCreateMaterial('red');\n    //instance.addMaterial(mat);\n  }\n    \n}\n",
+            "kl": "require InlineDrawing;\nrequire Oculus;\nrequire SpliceStandalone;\nrequire Singletons;\n\noperator oculusOp(io DrawingHandle handle, io ovrDevice or, in Scalar time, in Boolean stereo)\n{\n  if(!or.isConfigured()) {\n    or.configureTracking();\n    ovrViewportCallback callback(or);\n    callback.registerForViewport();\n  }\n  \n  or.setStereEnabled(stereo);\n}\n",
             "portmap": {}
           }
         }
@@ -53,8 +53,7 @@
       "autoInitObjects": true,
       "member": "stereo",
       "mode": "in",
-      "persistence": false,
-      "default": "true"
+      "persistence": false
     },
     {
       "name": "time",
