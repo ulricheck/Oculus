@@ -2,7 +2,7 @@
  *  Copyright 2010-2014 Fabric Software Inc. All rights reserved.
  */
 
-require SpliceStandalone;
+require SpliceStandalone:">1.0.0";
 require Singletons;
 
 object ovrViewportCallback : SpliceStandaloneViewportCallback {
@@ -84,7 +84,7 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
         setError("incomplete framebuffer!");
       }
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      report("Created render target: "+this.fb_width+"x"+this.fb_height);
+      report("Created render target: "+this.fb_width+"x"+this.fb_height+", window "+viewport.width+'x'+viewport.height);
 
       /* fill in the ovrGLTexture structures that describe our render target texture */
       for(ovrEyeType i=0; i<ovrEye_Count; i++) {
@@ -197,6 +197,8 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
         viewport.drawContext.viewport.camera.mat44 = camXfo.toMat44();
         if(this.device.isStereoEnabled())
           viewport.drawContext.viewport.camera.projection = this.device.getProjection(eye, viewport.drawContext.viewport.camera.nearDistance, viewport.drawContext.viewport.camera.farDistance, true);
+        else
+          viewport.drawContext.viewport.camera.projection.setNull();
 
         /* finally draw the scene for this eye */
         drawing.draw(viewport.drawContext);
