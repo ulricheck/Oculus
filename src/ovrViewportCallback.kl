@@ -8,6 +8,7 @@ require Singletons;
 object ovrViewportCallback : SpliceStandaloneViewportCallback {
   ovrDevice device;
   ovrDescription desc;
+  Color bgColor;
   UInt32 fbo[];
   UInt32 fb_width;
   UInt32 fb_height;
@@ -26,6 +27,7 @@ function ovrViewportCallback() {
   this.fb_tex.push(0);
   this.fb_tex.push(0);
   this.fb_depth.push(0);
+  this.bgColor = Color(0.7, 0.7, 0.7, 1.0);
 }
 
 function ovrViewportCallback(ovrDevice device) {
@@ -34,6 +36,7 @@ function ovrViewportCallback(ovrDevice device) {
   this.fbo.push(0);
   this.fb_tex.push(0);
   this.fb_depth.push(0);
+  this.bgColor = Color(0.7, 0.7, 0.7, 1.0);
 }
 
 function ovrViewportCallback.registerForViewport!() {
@@ -113,7 +116,8 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
       * timewrap, which shifts the image before drawing to counter any lattency between the call
       * to ovrDevice.getEyePose and ovrDevice.endFrame.
       */
-      Integer dcaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette | ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive;
+      // Integer dcaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette | ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive;
+      Integer dcaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette | ovrDistortionCap_Overdrive;
       // Integer dcaps = 0;
       if(!this.device.configureRendering(this.cfg, dcaps, this.desc.DefaultEyeFov, this.eye_rdesc)) {
         setError("Failed to configure distortion renderer.");
@@ -123,7 +127,7 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
       this.device.enableHSWDisplaySDKRender(false);
       
       glEnable(GL_DEPTH_TEST);
-      glClearColor(0.7, 0.7, 0.7, 1);
+      glClearColor(this.bgColor.r, this.bgColor.g, this.bgColor.b, this.bgColor.a);
 
       if(!viewport.gridInstance)
       {
@@ -157,7 +161,7 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
       }
 
       glViewport(0, 0, this.fb_width, this.fb_height);
-      glClearColor(0.7, 0.7, 0.7, 1);
+      glClearColor(this.bgColor.r, this.bgColor.g, this.bgColor.b, this.bgColor.a);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       return true;
@@ -212,7 +216,7 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
       glViewport(0, 0, viewport.width, viewport.height);
-      glClearColor(0.7, 0.7, 0.7, 1);
+      glClearColor(this.bgColor.r, this.bgColor.g, this.bgColor.b, this.bgColor.a);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       this.device.endFrame(this.poses, this.fb_ovr_tex);
