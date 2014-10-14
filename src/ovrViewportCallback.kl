@@ -18,25 +18,41 @@ object ovrViewportCallback : SpliceStandaloneViewportCallback {
   ovrGLConfig cfg;
   ovrEyeRenderDesc eye_rdesc[2];
   ovrPose poses[2];
-  Vec3 offset;
+
+  Vec3 walkOffset;
+  Quat turnOffset;
+
+  Float32 walkVelocitySpeed;
+  Float32 walkVelocityBlend;
+  Float32 walkVelocityDrag;
+  Float32 turnVelocitySpeed;
+  Float32 turnVelocityBlend;
+  Float32 turnVelocityDrag;
 };
 
 function ovrViewportCallback() {
-  this.device = null;
-  this.fbo.push(0);
-  this.fb_tex.push(0);
-  this.fb_tex.push(0);
-  this.fb_depth.push(0);
-  this.bgColor = Color(0.7, 0.7, 0.7, 1.0);
+  this.init(null);
 }
 
 function ovrViewportCallback(ovrDevice device) {
+  this.init(device);
+}
+
+function ovrViewportCallback.init!(ovrDevice device) {
   this.device = device;
-  this.desc = device.getDescription();
+  if(device)
+    this.desc = device.getDescription();
   this.fbo.push(0);
   this.fb_tex.push(0);
   this.fb_depth.push(0);
   this.bgColor = Color(0.7, 0.7, 0.7, 1.0);
+
+  this.walkVelocitySpeed = 1.5;
+  this.walkVelocityBlend = 0.025;
+  this.walkVelocityDrag = 0.995;
+  this.turnVelocitySpeed = 1.5;
+  this.turnVelocityBlend = 0.1;
+  this.turnVelocityDrag = 0.95;
 }
 
 function ovrViewportCallback.registerForViewport!() {
@@ -164,6 +180,12 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
       glClearColor(this.bgColor.r, this.bgColor.g, this.bgColor.b, this.bgColor.a);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+      viewport.camera.walkVelocitySpeed = this.walkVelocitySpeed;
+      viewport.camera.walkVelocityBlend = this.walkVelocityBlend;
+      viewport.camera.walkVelocityDrag = this.walkVelocityDrag;
+      viewport.camera.turnVelocitySpeed = this.turnVelocitySpeed;
+      viewport.camera.turnVelocityBlend = this.turnVelocityBlend;
+      viewport.camera.turnVelocityDrag = this.turnVelocityDrag;
       return true;
 
     }
@@ -186,14 +208,19 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
 
         Xfo camXfo;
         camXfo.ori = this.poses[eye].Orientation;
+        camXfo.ori = this.turnOffset * camXfo.ori;
 
         if(eye == ovrEye_Left) {
-          this.offset += viewport.camera.velocity.x * camXfo.ori.getXaxis();
-          this.offset += viewport.camera.velocity.y * camXfo.ori.getYaxis();
-          this.offset += viewport.camera.velocity.z * camXfo.ori.getZaxis();
+          this.walkOffset += viewport.camera.walkVelocity.x * camXfo.ori.getXaxis();
+          this.walkOffset += viewport.camera.walkVelocity.y * camXfo.ori.getYaxis();
+          this.walkOffset += viewport.camera.walkVelocity.z * camXfo.ori.getZaxis();
+
+          Quat turn;
+          turn.setFromAxisAndAngle(Vec3(0, 1, 0), viewport.camera.turnVelocity.x);
+          this.turnOffset = turn * this.turnOffset;
         }
 
-        camXfo.tr = this.poses[eye].Position * 10 + this.offset;
+        camXfo.tr = this.poses[eye].Position * 10 + this.walkOffset;
         viewport.drawContext.viewport.camera.mat44 = camXfo.toMat44();
         if(this.device.isStereoEnabled())
           viewport.drawContext.viewport.camera.projection = this.device.getProjection(eye, viewport.drawContext.viewport.camera.nearDistance, viewport.drawContext.viewport.camera.farDistance, true);
