@@ -104,7 +104,7 @@ function Boolean ovrDevice.isStereoEnabled() {
 }
 
 /// enables or disables stereo rendering
-function ovrDevice.setStereEnabled!(Boolean enable) {
+function ovrDevice.setStereoEnabled!(Boolean enable) {
   this.stereoEnabled = enable;
 }
 
