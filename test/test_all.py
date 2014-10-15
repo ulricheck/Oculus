@@ -70,6 +70,15 @@ class KLTest(unittest.TestCase):
       return
 
     currContent = open(logFilePath, 'rb').read()
+    currContent = currContent.replace('\r', '')
+    currContentSplit = currContent.split('\n')
+    currContent = []
+    for line in currContentSplit:
+      if line.startswith('['):
+        currContent += [line]
+    currContent = '\n'.join(currContent)
+    currContent = currContent.strip('\n')
+
     print '------- '+self.__klFilePath+' --------'
     print currContent
     print '----------------------------------'
@@ -80,6 +89,8 @@ class KLTest(unittest.TestCase):
 
     prevContent = open(outFilePath, 'rb').read()
     prevContent = prevContent.replace('\r', '')
+    prevContent = prevContent.strip('\n')
+
     self.assertEqual(currContent, prevContent)
 
 if __name__ == '__main__':
