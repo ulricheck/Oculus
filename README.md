@@ -4,6 +4,8 @@ A KL extension for the Oculus Rift SDK
 
 Oculus allows you to read the head tracking information from the Oculus Rift, and adds functionality to the InlineDrawing realtime rendering for two eyed warped display.
 
+Oculus is currently only supported on Windows.
+
 extension status
 ================
 
