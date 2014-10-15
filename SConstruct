@@ -83,4 +83,6 @@ env.Append(LIBPATH = [os.path.join(os.environ['OCULUS_DIR'], 'LibOVR', 'Lib', 'x
 env.Append(CPPPATH = [os.environ['BOOST_INCLUDE_DIR']])
 env.Append(LIBPATH = [os.environ['BOOST_LIBRARY_DIR']])
 
-SConscript('src/SConscript', variant_dir = 'build', exports = {'parentEnv': env, 'STAGE_DIR': env.Dir('stage')}, duplicate=0)
+alias = SConscript('src/SConscript', variant_dir = 'build', exports = {'parentEnv': env, 'STAGE_DIR': env.Dir('stage')}, duplicate=0)
+
+env.Default(alias)

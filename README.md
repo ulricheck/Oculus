@@ -35,7 +35,7 @@ To inform scons where to find the Fabric Engine includes as well as the thirdpar
 * BOOST_INCLUDE_DIR: Should point to Boost include folder.
 * BOOST_LIBRARY_DIR: Should point to Boost library folder.
 
-The temporary files will be built into the *build* folder, while the structured output files will be placed in the *stage* folder.
+The temporary files will be built into the *build* folder, while the structured output files will be placed in the *stage* folder. Optionally you can define the FABRIC_EXTS_INSTALL_DIR environment variable, to which the extension will be installed.
 
 Note: The fabric.sh exists purely for Fabric Engine internal use.
 
