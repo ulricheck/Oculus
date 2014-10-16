@@ -21,6 +21,7 @@ object ovrViewportCallback : SpliceStandaloneViewportCallback {
 
   Vec3 walkOffset;
   Quat turnOffset;
+  Xfo worldXfo;
 };
 
 function ovrViewportCallback() {
@@ -201,6 +202,10 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
         }
 
         camXfo.tr = this.poses[eye].Position * 10 + this.walkOffset;
+
+        if(eye == ovrEye_Left)
+          this.worldXfo = camXfo;
+        
         viewport.drawContext.viewport.camera.mat44 = camXfo.toMat44();
         if(this.device.isStereoEnabled())
           viewport.drawContext.viewport.camera.projection = this.device.getProjection(eye, viewport.drawContext.viewport.camera.nearDistance, viewport.drawContext.viewport.camera.farDistance, true);
