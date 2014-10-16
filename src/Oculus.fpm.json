@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "libs": "oculus",
+  "libs": "Oculus",
   "code": [
     "ovrSize.kl",
     "ovrVec2.kl",
