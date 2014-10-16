@@ -4,8 +4,6 @@ A KL extension for the Oculus Rift SDK
 
 Oculus allows you to read the head tracking information from the Oculus Rift, and adds functionality to the InlineDrawing realtime rendering for two eyed warped display.
 
-Oculus is currently only supported on Windows.
-
 extension status
 ================
 
@@ -14,14 +12,14 @@ This extension has been built and tested against Fabric Engine 1.3.1. Higher rel
 structure
 =========
 
-The Oculus extensions uses the KL2EDK tool to generate the required C++ headers. Since the number of callbacks is quite small, they are handcrafted and don't use KL2EDK's advanced codegen functionality.
+The Oculus extension uses the KL2EDK tool to generate the required C++ headers. Since the number of callbacks is quite small, they are handcrafted and don't use KL2EDK's advanced codegen functionality.
 
 The latest KL2EDK documentation can be found here: http://documentation.fabricengine.com/FabricEngine/latest/HTML/ExtensionAuthoringGuide/kl2edk.html
 
 supported platforms
 ===================
 
-To date all three major platforms (windows, linux, osx) are supported, if you build the thirdparty dependencies for the corresponding platform.
+Oculus is currently only supported on Windows.
 
 building
 ========
@@ -52,6 +50,8 @@ samples
 =======
 
 The splice files in the samples folder can be run with the splice standalone command line tool.
+
+Some samples might require the RazerHydra extension, which is also available as a public repository.
 
 license
 ==========
