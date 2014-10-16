@@ -51,7 +51,7 @@ samples
 
 The splice files in the samples folder can be run with the splice standalone command line tool.
 
-Some samples might require the RazerHydra extension, which is also available as a public repository.
+Some samples might require the RazerHydra or the XBox extension, which are also available as public repositories.
 
 license
 ==========

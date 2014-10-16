@@ -21,13 +21,6 @@ object ovrViewportCallback : SpliceStandaloneViewportCallback {
 
   Vec3 walkOffset;
   Quat turnOffset;
-
-  Float32 walkVelocitySpeed;
-  Float32 walkVelocityBlend;
-  Float32 walkVelocityDrag;
-  Float32 turnVelocitySpeed;
-  Float32 turnVelocityBlend;
-  Float32 turnVelocityDrag;
 };
 
 function ovrViewportCallback() {
@@ -46,13 +39,6 @@ function ovrViewportCallback.init!(ovrDevice device) {
   this.fb_tex.push(0);
   this.fb_depth.push(0);
   this.bgColor = Color(0.7, 0.7, 0.7, 1.0);
-
-  this.walkVelocitySpeed = 1.5;
-  this.walkVelocityBlend = 0.025;
-  this.walkVelocityDrag = 0.995;
-  this.turnVelocitySpeed = 1.5;
-  this.turnVelocityBlend = 0.1;
-  this.turnVelocityDrag = 0.95;
 }
 
 function ovrViewportCallback.registerForViewport!() {
@@ -180,12 +166,6 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
       glClearColor(this.bgColor.r, this.bgColor.g, this.bgColor.b, this.bgColor.a);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      viewport.camera.walkVelocitySpeed = this.walkVelocitySpeed;
-      viewport.camera.walkVelocityBlend = this.walkVelocityBlend;
-      viewport.camera.walkVelocityDrag = this.walkVelocityDrag;
-      viewport.camera.turnVelocitySpeed = this.turnVelocitySpeed;
-      viewport.camera.turnVelocityBlend = this.turnVelocityBlend;
-      viewport.camera.turnVelocityDrag = this.turnVelocityDrag;
       return true;
 
     }
