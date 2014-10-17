@@ -19,6 +19,7 @@ object ovrViewportCallback : SpliceStandaloneViewportCallback {
   ovrEyeRenderDesc eye_rdesc[2];
   ovrPose poses[2];
 
+  Float32 poseScale;
   Vec3 walkOffset;
   Quat turnOffset;
   Xfo worldXfo;
@@ -40,6 +41,7 @@ function ovrViewportCallback.init!(ovrDevice device) {
   this.fb_tex.push(0);
   this.fb_depth.push(0);
   this.bgColor = Color(0.7, 0.7, 0.7, 1.0);
+  this.poseScale = 10.0;
 }
 
 function ovrViewportCallback.registerForViewport!() {
@@ -201,7 +203,7 @@ function Boolean ovrViewportCallback.perform!(SpliceStandaloneViewportPhase phas
           this.turnOffset = turn * this.turnOffset;
         }
 
-        camXfo.tr = this.poses[eye].Position * 10 + this.walkOffset;
+        camXfo.tr = this.poses[eye].Position * this.poseScale + this.walkOffset;
 
         if(eye == ovrEye_Left)
           this.worldXfo = camXfo;
