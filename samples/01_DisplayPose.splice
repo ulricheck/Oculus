@@ -14,7 +14,7 @@
             "name": "oculusOp",
             "entry": "oculusOp",
             "filename": "oculusOp.kl",
-            "kl": "require InlineDrawing;\nrequire Oculus;\nrequire SpliceStandalone;\nrequire Singletons;\n\noperator oculusOp(io DrawingHandle handle, io ovrDevice or, in Scalar time, in Boolean stereo)\n{\n  if(!or.isConfigured()) {\n    or.configureTracking();\n    ovrViewportCallback callback(or);\n    callback.registerForViewport();\n  }\n  \n  or.setStereoEnabled(stereo);\n}\n",
+            "kl": "require InlineDrawing;\nrequire Oculus;\nrequire Singletons;\n\noperator oculusOp(io DrawingHandle handle, io ovrDevice or, in Scalar time, in Boolean stereo)\n{\n  if(!or.isConfigured()) {\n    or.configureTracking();\n    ovrViewportCallback callback(or);\n    callback.registerForViewport();\n  }\n  \n  or.setStereoEnabled(stereo);\n}\n",
             "portmap": {}
           }
         }

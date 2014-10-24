@@ -3,7 +3,6 @@
  */
 
 require InlineDrawing:">1.0.0";
-require SpliceStandalone:">1.0.0";
 require Singletons;
 
 object ovrViewportCallback : ViewportCallback {
@@ -64,16 +63,16 @@ function ovrViewportCallback.registerForViewport!() {
 }
 
 function Boolean ovrViewportCallback.invoke!(ViewportDrawPhase phase, io Viewport viewport, io DrawContext context) {
-  SpliceStandaloneViewport vp = viewport;
+  OGLStandaloneViewport vp = viewport;
   if(!vp) {
-    setError('The viewport has to be a SpliceStandaloneViewport, since we need access to the windowId.');
+    setError('The viewport has to be a OGLStandaloneViewport, since we need access to the windowId.');
     return false;
   }
 
   switch(phase) {
     case ViewportDrawPhase_Resize: {
       if(!this.requiresSetup)
-        break;
+        return false;
     }
     case ViewportDrawPhase_Setup: {
 
@@ -177,7 +176,7 @@ function Boolean ovrViewportCallback.invoke!(ViewportDrawPhase phase, io Viewpor
       //   vp.gridInstance = InlineInstance('StandaloneGrid', drawing.getRoot(), grid, mat);
       // }
 
-      return true;
+      return phase == ViewportDrawPhase_Setup;
     }
     case ViewportDrawPhase_PreDraw: {
 
@@ -187,9 +186,10 @@ function Boolean ovrViewportCallback.invoke!(ViewportDrawPhase phase, io Viewpor
 
         /* start drawing onto our texture render target */
         glBindFramebuffer(GL_FRAMEBUFFER, this.fbo[0]);
+  
+        glViewport(0, 0, this.fb_width, this.fb_height);
       }
 
-      glViewport(0, 0, this.fb_width, this.fb_height);
       glClearColor(this.bgColor.r, this.bgColor.g, this.bgColor.b, this.bgColor.a);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
