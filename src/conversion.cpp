@@ -103,7 +103,7 @@ namespace Fabric
       convert(a.Fov, b.Fov);
       convert(a.DistortedViewport, b.DistortedViewport);
       convert(a.PixelsPerTanAngleAtCenter, b.PixelsPerTanAngleAtCenter);
-      convert(a.ViewAdjust, b.ViewAdjust);
+      convert(a.HmdToEyeViewOffset, b.HmdToEyeViewOffset);
     }
 
     void convert(KL::ovrGLTexture a, ovrTexture & b) {
@@ -237,7 +237,7 @@ namespace Fabric
       convert(a.Fov, b.Fov);
       convert(a.DistortedViewport, b.DistortedViewport);
       convert(a.PixelsPerTanAngleAtCenter, b.PixelsPerTanAngleAtCenter);
-      convert(a.ViewAdjust, b.ViewAdjust);
+      convert(a.HmdToEyeViewOffset, b.HmdToEyeViewOffset);
     }
 
     void convert(const ovrTexture & a, KL::ovrGLTexture & b) {

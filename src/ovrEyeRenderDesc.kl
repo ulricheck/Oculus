@@ -17,5 +17,5 @@ struct ovrEyeRenderDesc {
   /// How many display pixels will fit in tan(angle) = 1.
   Vec2 PixelsPerTanAngleAtCenter;  
   /// Translation to be applied to view matrix.
-  Vec3 ViewAdjust;             
+  Vec3 HmdToEyeViewOffset;             
 };

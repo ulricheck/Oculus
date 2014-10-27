@@ -325,9 +325,9 @@ FABRIC_EXT_EXPORT void ovrDevice_GetEyePoses(
     return;
   ovrHmd hmd = (ovrHmd)this_->handle;
 
-  ovrPosef pose = ovrHmd_GetEyePose(hmd, ovrEye_Left);
+  ovrPosef pose = ovrHmd_GetHmdPosePerEye(hmd, ovrEye_Left);
   convert(pose, _result[0]);
-  pose = ovrHmd_GetEyePose(hmd, ovrEye_Right);
+  pose = ovrHmd_GetHmdPosePerEye(hmd, ovrEye_Right);
   convert(pose, _result[1]);
 }
 
