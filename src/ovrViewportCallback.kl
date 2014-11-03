@@ -144,8 +144,8 @@ function Boolean ovrViewportCallback.invoke!(ViewportDrawPhase phase, io Viewpor
       * timewrap, which shifts the image before drawing to counter any lattency between the call
       * to ovrDevice.getEyePose and ovrDevice.endFrame.
       */
-      // Integer dcaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette | ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive;
-      Integer dcaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette | ovrDistortionCap_Overdrive;
+      // Integer dcaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette | ovrDistortionCap_Overdrive;
+      Integer dcaps = ovrDistortionCap_Vignette | ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive;
       // Integer dcaps = 0;
       if(!this.device.configureRendering(this.cfg, dcaps, this.desc.DefaultEyeFov, this.eye_rdesc)) {
         setError("Failed to configure distortion renderer.");
@@ -238,7 +238,7 @@ function Boolean ovrViewportCallback.invoke!(ViewportDrawPhase phase, io Viewpor
           // this.turnOffset = this.turnOffset * angularDelta;
         }
 
-        camXfo.tr = this.poses[eye].Position * this.poseScale + this.walkOffset;
+        camXfo.tr = this.turnOffset.rotateVector(this.poses[eye].Position) * this.poseScale + this.walkOffset;
 
         if(eye == ovrEye_Left)
           this.worldXfo = camXfo;
