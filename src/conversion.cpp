@@ -117,7 +117,11 @@ namespace Fabric
 
     void convert(KL::ovrGLConfig a, ovrRenderAPIConfig & b) {
       b.Header.API = (ovrRenderAPIType)a.API;
+#if OVR_MAJOR_VERSION == 0 && (OVR_MINOR_VERSION < 4 || (OVR_MINOR_VERSION == 4 && OVR_BUILD_VERSION <= 3))
       convert(a.RTSize, b.Header.RTSize);
+#else
+      convert(a.RTSize, b.Header.BackBufferSize);
+#endif
       b.Header.Multisample = a.Multisample;
 
       ovrGLConfig * bGL = (ovrGLConfig*)&b;
@@ -251,7 +255,11 @@ namespace Fabric
 
     void convert(ovrRenderAPIConfig a, KL::ovrGLConfig & b) {
       b.API = a.Header.API;
+#if OVR_MAJOR_VERSION == 0 && (OVR_MINOR_VERSION < 4 || (OVR_MINOR_VERSION == 4 && OVR_BUILD_VERSION <= 3))
       convert(a.Header.RTSize, b.RTSize);
+#else
+      convert(a.Header.BackBufferSize, b.RTSize);
+#endif
       b.Multisample = a.Header.Multisample;
 
       ovrGLConfig * aGL = (ovrGLConfig*)&a;
