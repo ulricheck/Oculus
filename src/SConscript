@@ -8,28 +8,33 @@ extName = 'Oculus'
 
 env = parentEnv.Clone()
 env.Append(CPPPATH = [env.Dir('.').abspath])
-env.Append(LIBS = ['libovr64'])
-env.Append(LIBS = ['libboost_thread-vc100-mt-s-1_55'])
-env.Append(CCFLAGS = ['/EHsc'])
+# env.Append(LIBS = ['libovr64'])
+env.Append(LIBS = ['libovr.a'])
+# env.Append(LIBS = ['libboost_thread-vc100-mt-s-1_55'])
+env.Append(LIBS = ['libboost_thread', 'libboost_system'])
+# env.Append(CCFLAGS = ['/EHsc'])
+env.Append(CCFLAGS = ['-stdlib=libstdc++'])
 
-env.Append(LIBS = [
-  'ws2_32.lib',
-  'opengl32.lib',
-  'Dbghelp.lib',
-  'winmm.lib',
-  'kernel32.lib',
-  'user32.lib',
-  'gdi32.lib',
-  'winspool.lib',
-  'comdlg32.lib',
-  'advapi32.lib',
-  'shell32.lib',
-  'ole32.lib',
-  'oleaut32.lib',
-  'uuid.lib',
-  'odbc32.lib',
-  'odbccp32.lib'
-])
+# env.Append(LIBS = [
+#   'ws2_32.lib',
+#   'opengl32.lib',
+#   'Dbghelp.lib',
+#   'winmm.lib',
+#   'kernel32.lib',
+#   'user32.lib',
+#   'gdi32.lib',
+#   'winspool.lib',
+#   'comdlg32.lib',
+#   'advapi32.lib',
+#   'shell32.lib',
+#   'ole32.lib',
+#   'oleaut32.lib',
+#   'uuid.lib',
+#   'odbc32.lib',
+#   'odbccp32.lib'
+# ])
+
+env.Append(SHLINKFLAGS = '-framework IOKit -framework OpenGL -framework Cocoa -stdlib=libstdc++')
 
 sources = [
   env.File('Oculus.fpm.json')
@@ -51,7 +56,8 @@ extVersion = extData['version']
 extensionFiles = env.Install(STAGE_DIR, [env.File(extName+'.fpm.json')] + env.Glob('*.kl'))
 kl2edkResults = env.RunKL2EDK(headers, sources)
 
-extLibFileName = env.File(extName + '-' + extSuffix)
+# extLibFileName = env.File(extName + '-' + extSuffix)
+extLibFileName = env.File('lib' + extName + '-' + extSuffix)
 libraryFiles = Flatten([env.SharedLibrary(extLibFileName, cppFiles)])
 env.Depends(cppFiles, kl2edkResults)
 

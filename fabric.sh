@@ -2,7 +2,7 @@
 # Copyright 2010-2014 Fabric Software Inc. All rights reserved.
 #
 
-export OCULUS_DIR=/e/thirdparty/oculus/0.4.3/OculusSDK
-export BOOST_INCLUDE_DIR=$FABRIC_SCENE_GRAPH_DIR/ThirdParty/Prebuilt/$FABRIC_BUILD_DIST/$FABRIC_BUILD_ARCH/Release/boost/1.55.0
-export BOOST_LIBRARY_DIR=$FABRIC_SCENE_GRAPH_DIR/ThirdParty/Prebuilt/$FABRIC_BUILD_DIST/$FABRIC_BUILD_ARCH/Release/boost/1.55.0/lib
-export FABRIC_EXTS_INSTALL_DIR=$FABRIC_DIR/Exts/BuiltinNoInstaller
+export OCULUS_DIR=/Users/jack/mywork/phd/experiments/hmd/arrift/OculusSDK
+export BOOST_INCLUDE_DIR=/Users/jack/mywork/phd/experiments/fabric/src/boost_1_55_0-stdc++/include
+export BOOST_LIBRARY_DIR=/Users/jack/mywork/phd/experiments/fabric/src/boost_1_55_0-stdc++/lib
+export FABRIC_EXTS_INSTALL_DIR=/Users/jack/mywork/phd/experiments/fabric/CustomExtensions
